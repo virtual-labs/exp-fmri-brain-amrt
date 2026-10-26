@@ -1,1 +1,1 @@
-## Experiment name
+## fMRI: Brain Imaging & Activation Mapping
