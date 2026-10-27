@@ -7,10 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #cbd5e1;
+      background-color: #ffffff;
+      color: #1e293b;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
@@ -19,36 +20,33 @@
 
     #fmri-bench-canvas {
       cursor: default;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+      background-color: #ffffff;
       touch-action: manipulation;
     }
 
-    #ocular-canvas {
-      touch-action: none;
+    .stage-fade-in {
+      animation: fadeInStage 0.35s ease-out forwards;
     }
-
-    @keyframes pulse-border {
-      0%, 100% { border-color: #a4123f; box-shadow: 0 0 0 0 rgba(164, 18, 63, 0.4); }
-      50% { border-color: #e11d48; box-shadow: 0 0 0 5px rgba(164, 18, 63, 0); }
-    }
-    .instruction-glow {
-      animation: pulse-border 2s infinite;
+    @keyframes fadeInStage {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col text-slate-800">
+<body class="min-h-screen flex flex-col bg-white">
 
-  <!-- Top Bar: Solely the Amrita Logo on the Top Left -->
-  <header class="bg-white border-b border-slate-300 px-3 sm:px-6 py-2 shadow-xs">
+  <!-- Top Header: Solely the Amrita Logo on the Top Left -->
+  <header class="bg-white border-b border-slate-200 px-3 sm:px-6 py-2.5">
     <div class="max-w-7xl mx-auto flex items-center justify-start">
       <img 
-         id="amrita-brand-logo"
+        id="amrita-brand-logo"
         img src="images\logo1.jpg" 
         alt="Amrita Vishwa Vidyapeetham" 
         style="max-height: 68px; width: auto; height: auto; display: block;"
         onerror="handleLogoFallback(this)"
+
       >
-      <label id="logo-file-picker" class="hidden cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed border-[#a4123f] bg-rose-50 hover:bg-rose-100 text-[#a4123f] text-xs font-semibold transition">
+      <label id="logo-file-picker" class="hidden cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 rounded border border-dashed border-slate-400 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition">
         <i data-lucide="image-plus" class="w-4 h-4 shrink-0"></i>
         <span class="truncate max-w-[240px] sm:max-w-none">Select "logo-branding-amrita-universiy-2024 (1).jpg"</span>
         <input type="file" accept="image/*" class="hidden" onchange="embedExactLogo(event)">
@@ -56,338 +54,266 @@
     </div>
   </header>
 
-  <!-- Main Virtual Lab Container -->
-  <main class="max-w-7xl mx-auto px-2.5 sm:px-4 py-3 sm:py-4 flex-grow w-full space-y-3.5 sm:space-y-4">
+  <!-- Main Progressive-Disclosure Workspace (Pure White Background) -->
+  <main class="max-w-6xl mx-auto px-3 sm:px-6 py-5 flex-grow w-full space-y-5 bg-white">
 
-    <!-- Top Instruction, Brain Activity Selector & Touch Action Bar -->
-    <div class="bg-white rounded-xl border-2 border-[#a4123f] p-3 sm:p-3.5 shadow-sm flex flex-col gap-3 instruction-glow">
-      
-      <!-- Top Row: Step Instruction + Direct Touch Action Button -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-        <div class="flex items-start sm:items-center gap-2.5">
-          <span id="step-number-circle" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#a4123f] text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow">
-            1
-          </span>
-          <div>
-            <div class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#a4123f]" id="step-header-tag">
-              STEP 1 OF 6 • PLACE VOLUNTEER ON THE MRI BED
-            </div>
-            <p id="instruction-banner-text" class="text-xs sm:text-sm font-semibold text-slate-900 leading-snug">
-              Choose a simple brain activity below, then tap the MRI Patient Bed (or tap "Perform Step 1" right here) to position the volunteer.
-            </p>
+    <!-- ==================== STAGE 0: MANDATORY BRAIN TASK SELECTION CARD (ALWAYS VISIBLE) ==================== -->
+    <section id="stage-0-selector" class="bg-white rounded-xl border-2 border-[#a4123f] p-4 sm:p-5 shadow-xs transition-all">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1 text-left">
+          <div class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#a4123f]">
+            <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+            Mandatory Initial Step • Select Experimental Paradigm
           </div>
-        </div>
-
-        <!-- Thumb-Friendly Direct Step Trigger Button (Ideal for Smartphones & Tablets) -->
-        <button id="quick-step-btn" onclick="triggerCurrentStepAction()" class="w-full sm:w-auto shrink-0 bg-[#a4123f] hover:bg-[#830e32] active:scale-[0.99] text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer">
-          <i data-lucide="play" class="w-4 h-4"></i>
-          <span id="quick-step-btn-text">Perform Step 1: Position Volunteer</span>
-        </button>
-      </div>
-
-      <!-- Bottom Row: Activity Dropdown & Responsive Quick-View Buttons -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-2 border-t border-slate-100">
-        <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-300 w-full md:w-auto">
-          <label for="paradigm-select" class="text-xs font-bold text-slate-700 shrink-0">Activity:</label>
-          <select id="paradigm-select" onchange="changeParadigm()" class="w-full md:w-auto bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold text-slate-900 cursor-pointer focus:outline-none focus:border-[#a4123f]">
-            <option value="motor">Activity 1: Moving Right-Hand Fingers (Movement)</option>
-            <option value="visual">Activity 2: Looking at Flashing Patterns (Vision)</option>
-            <option value="auditory">Activity 3: Listening to Music &amp; Tones (Hearing)</option>
-            <option value="language">Activity 4: Thinking of Words Silently (Speech)</option>
-            <option value="memory">Activity 5: Solving a Memory Puzzle (Thinking)</option>
-            <option value="dmn">Activity 6: Resting with Eyes Closed (Daydreaming)</option>
-          </select>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 w-full md:w-auto">
-          <button onclick="openOcularModal('boldscope')" class="justify-center bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-2.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
-            <i data-lucide="activity" class="w-3.5 h-3.5 shrink-0"></i> <span>BOLD Scope</span>
-          </button>
-
-          <button onclick="openOcularModal('brainmap')" class="justify-center bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold px-2.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
-            <i data-lucide="brain" class="w-3.5 h-3.5 shrink-0"></i> <span>Brain Map</span>
-          </button>
-
-          <button onclick="openOcularModal('hrfwave')" class="justify-center bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-2.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
-            <i data-lucide="trending-up" class="w-3.5 h-3.5 shrink-0"></i> <span>Oxygen Wave</span>
-          </button>
-
-          <button onclick="resetScannerSuite()" class="justify-center bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-2.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
-            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 shrink-0"></i> <span>Reset</span>
-          </button>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ==================== INTERACTIVE 2D PHYSICAL fMRI SUITE CANVAS ==================== -->
-    <div class="relative w-full overflow-hidden rounded-xl sm:rounded-2xl border-2 border-slate-400 bg-slate-900">
-      <canvas id="fmri-bench-canvas" width="1150" height="450" class="w-full h-auto block"></canvas>
-
-      <!-- Floating Tooltip when Hovering Over Any Apparatus on Desktop -->
-      <div id="apparatus-tooltip" class="hidden pointer-events-none absolute bg-slate-900/95 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-cyan-400 shadow-lg z-20"></div>
-    </div>
-
-    <!-- ==================== RESPONSIVE LIVE BACKGROUND PROCESS VISUALIZER CARD (SHOWS WHAT HAPPENS INSIDE THE BRAIN) ==================== -->
-    <div class="bg-slate-900 text-white rounded-xl border border-slate-700 p-3 sm:p-4 shadow-sm grid grid-cols-1 md:grid-cols-12 gap-3.5 items-center">
-      <!-- Left: Animated Microscopic Neurovascular / BOLD Cutaway Canvas (4 cols) -->
-      <div class="md:col-span-4 flex flex-col items-center justify-center bg-slate-950 rounded-lg border border-slate-800 p-2">
-        <div class="w-full flex justify-between items-center text-[10px] mono px-1 mb-1">
-          <span class="text-cyan-400 font-bold">WHAT'S HAPPENING INSIDE</span>
-          <span id="bg-process-live-pill" class="px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-slate-700">
-            Ready
-          </span>
-        </div>
-        <canvas id="bg-cutaway-canvas" width="320" height="110" class="w-full max-w-[320px] h-auto rounded bg-slate-900"></canvas>
-      </div>
-
-      <!-- Right: Simple Beginner HTML Explanation of the Background Process (8 cols) -->
-      <div class="md:col-span-8 space-y-1.5">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5" id="bg-process-stage-tag">
-            <i data-lucide="sparkles" class="w-4 h-4 text-rose-400 shrink-0"></i>
-            STEP 1 BIO-PROCESS: RESTING BRAIN CELLS &amp; BASELINE BLOOD FLOW
-          </span>
-          <span id="bg-progress-pct" class="mono text-xs font-bold text-emerald-400">0%</span>
-        </div>
-        <p id="bg-process-description" class="text-xs sm:text-sm text-slate-200 leading-relaxed">
-          <strong>What happens inside the brain:</strong> Before the activity begins, brain cells (neurons) are resting quietly. Tiny blood vessels (capillaries) carry a steady, balanced mix of <strong class="text-red-400">oxygen-rich blood</strong> and <strong class="text-blue-400">oxygen-poor blood</strong>.
-        </p>
-        <!-- Progress Bar -->
-        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-          <div id="bg-progress-bar" class="bg-gradient-to-r from-cyan-500 via-amber-400 to-emerald-400 h-full transition-all duration-150" style="width: 0%;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==================== BOTTOM BEGINNER WORKSHEET, LIVE BOLD OXYGEN SCOPE & LOGBOOK ==================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-      <!-- Simple Brain Region Interpretation Worksheet (7 cols) -->
-      <div class="lg:col-span-7 bg-white rounded-xl shadow-sm border border-slate-300 p-3 sm:p-4 space-y-3">
-        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-200 pb-2.5">
-          <div>
-            <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
-              <i data-lucide="brain" class="w-4 h-4 text-[#a4123f] shrink-0"></i>
-              Brain Activity &amp; Region Interpretation Worksheet
-            </h3>
-            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">
-              Complete Step 5 (Start fMRI Oxygen Scan) to see which brain areas light up and why. Tap any row to view it on the 3D Brain Map!
-            </p>
-          </div>
-          <span id="scan-status-badge" class="text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-300">
-            Scanner Ready
-          </span>
-        </div>
-
-        <div class="overflow-x-auto -mx-1 px-1">
-          <table class="w-full text-[11px] sm:text-xs text-left border-collapse min-w-[420px]">
-            <thead>
-              <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
-                <th class="p-2">Brain Region Activated</th>
-                <th class="p-2">Where It Is Located</th>
-                <th class="p-2">Oxygen Boost (BOLD)</th>
-                <th class="p-2">What This Part of the Brain Does</th>
-              </tr>
-            </thead>
-            <tbody id="fmri-worksheet-body" class="divide-y divide-slate-100">
-              <!-- Populated via JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Right Column: Live Embedded Capillary BOLD Scope + Auto-Recorded Logbook (5 cols) -->
-      <div class="lg:col-span-5 space-y-4">
-
-        <!-- Embedded Live Capillary Oxygen Rush & BOLD Wave Scope Card -->
-        <div class="bg-slate-900 p-3 sm:p-3.5 rounded-xl shadow-sm border border-slate-800 text-white space-y-2">
-          <div class="flex flex-wrap justify-between items-center gap-1">
-            <span class="text-xs font-semibold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              Capillary Oxygen Rush &amp; BOLD Wave Scope
-            </span>
-            <div class="flex items-center gap-1.5">
-              <button onclick="toggleTaskBurst()" id="burst-btn-inline" class="text-[10px] font-semibold bg-slate-800 hover:bg-rose-900 text-amber-300 px-2 py-1 rounded border border-slate-700 cursor-pointer transition">
-                Trigger O₂ Rush
-              </button>
-              <button onclick="openOcularModal('boldscope')" class="text-[10px] font-semibold bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 px-2 py-1 rounded border border-emerald-600 cursor-pointer transition">
-                Full Screen
-              </button>
-            </div>
-          </div>
-
-          <canvas 
-            id="bold-scope-inline" 
-            width="420" 
-            height="175" 
-            onclick="openOcularModal('boldscope')"
-            class="w-full h-auto block rounded-lg bg-slate-950 border border-slate-800 cursor-pointer"
-            title="Tap to expand Capillary BOLD Scope"
-          ></canvas>
-
-          <p class="text-[11px] text-slate-400 leading-snug flex justify-between items-center">
-            <span>Left: Capillary Blood (<span class="text-red-400">● Oxy-Hb</span> vs <span class="text-blue-400">● Deoxy-Hb</span>). Right: Live BOLD Signal.</span>
-            <span id="inline-bold-status" class="mono text-[10px] text-emerald-400 font-bold shrink-0 ml-2">RESTING</span>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900">
+            fMRI: Brain Imaging &amp; Activation Mapping
+          </h1>
+          <p id="stage-0-subtext" class="text-xs sm:text-sm text-slate-600">
+            Please select a cognitive or sensory brain task from the dropdown menu to unlock the MRI scanner setup.
           </p>
         </div>
 
-        <!-- Auto-Recorded Observation Logbook & Export -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-300 p-3 sm:p-4 flex flex-col justify-between space-y-3">
-          <div class="space-y-2">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2.5">
-              <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
-                <i data-lucide="book-check" class="w-4 h-4 text-emerald-700 shrink-0"></i>
-                Student Observation Logbook
-              </h3>
-              <div class="flex gap-1.5">
-                <button onclick="downloadCSV()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1 cursor-pointer shadow-2xs">
-                  <i data-lucide="download" class="w-3.5 h-3.5"></i> CSV
-                </button>
-                <button onclick="downloadReportTXT()" class="bg-rose-50 hover:bg-rose-100 text-[#a4123f] border border-rose-200 text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1 cursor-pointer">
-                  <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Summary
-                </button>
-              </div>
-            </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0">
+          <select id="paradigm-select" onchange="onMandatoryTaskSelected()" class="bg-white border-2 border-slate-300 focus:border-[#a4123f] rounded-lg px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-900 cursor-pointer focus:outline-none">
+            <option value="" selected disabled>-- Select a Brain Task to Begin --</option>
+            <option value="motor">1. Right-Hand Finger Tapping (Movement)</option>
+            <option value="visual">2. Flashing Checkerboard Pattern (Vision)</option>
+            <option value="auditory">3. Listening to Pure Tones (Hearing)</option>
+            <option value="language">4. Silent Word Generation (Speech)</option>
+            <option value="memory">5. Short-Term Memory Puzzle (Thinking)</option>
+            <option value="dmn">6. Eyes-Closed Resting State (Default Mode)</option>
+          </select>
 
-            <div class="overflow-x-auto max-h-44 -mx-1 px-1">
-              <table class="w-full text-[11px] text-left border-collapse min-w-[340px]">
-                <thead>
-                  <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
-                    <th class="p-1.5">#</th>
-                    <th class="p-1.5">Activity</th>
-                    <th class="p-1.5">Active Brain Area</th>
-                    <th class="p-1.5">Side</th>
-                    <th class="p-1.5">O₂ Boost</th>
-                  </tr>
-                </thead>
-                <tbody id="logbook-tbody" class="divide-y divide-slate-100">
-                  <tr>
-                    <td colspan="5" class="p-4 text-center text-slate-400">
-                      Follow the 6 steps on the MRI bench above; each completed scan is automatically saved here.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <button id="reset-btn" onclick="resetToInitialStage()" class="hidden bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-3.5 py-2.5 rounded-lg transition items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+        </div>
+      </div>
+    </section>
 
-          <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between gap-2">
-            <span><strong>Rule:</strong> More neuron firing = More fresh O₂ = Brighter fMRI glow!</span>
-            <span id="log-counter" class="mono font-bold text-[#a4123f] shrink-0">0 Logged</span>
+    <!-- ==================== STAGE 1: ACTIVE STEP BANNER & 2D MRI SETUP (HIDDEN UNTIL TASK IS SELECTED) ==================== -->
+    <section id="stage-1-scanner" class="hidden space-y-4 stage-fade-in">
+      
+      <!-- Step Instruction & Direct Action Button Bar -->
+      <div class="bg-white rounded-lg border border-slate-300 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start sm:items-center gap-3">
+          <span id="step-number-circle" class="w-8 h-8 rounded-full bg-[#a4123f] text-white font-bold text-xs sm:text-sm flex items-center justify-center shrink-0">
+            1
+          </span>
+          <div class="text-left">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#a4123f]" id="step-header-tag">
+              STEP 1 OF 5 • POSITION PATIENT ON MRI TABLE
+            </div>
+            <p id="instruction-banner-text" class="text-xs sm:text-sm font-medium text-slate-800 leading-snug mt-0.5">
+              Click the MRI Patient Table on the diagram below (or click the button on the right) to position the patient supine.
+            </p>
           </div>
         </div>
 
+        <button id="quick-step-btn" onclick="triggerCurrentStepAction()" class="w-full sm:w-auto shrink-0 bg-[#a4123f] hover:bg-[#830e32] active:scale-[0.99] text-white font-semibold text-xs px-4 py-2.5 rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i>
+          <span id="quick-step-btn-text">Step 1: Position Patient</span>
+        </button>
       </div>
-    </div>
+
+      <!-- Pure White 2D MRI Diagram (Only draws apparatus relevant to the current step!) -->
+      <div class="relative w-full overflow-hidden rounded-lg border border-slate-300 bg-white">
+        <canvas id="fmri-bench-canvas" width="1100" height="360" class="w-full h-auto block bg-white"></canvas>
+        <div id="apparatus-tooltip" class="hidden pointer-events-none absolute bg-slate-900 text-white text-xs font-medium px-3 py-1.5 rounded shadow-md z-20"></div>
+      </div>
+
+      <!-- Current Step Internal Process View (Shows only what is happening right now) -->
+      <div class="bg-white rounded-lg border border-slate-300 p-3.5 sm:p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+        <div class="md:col-span-4 flex flex-col items-center justify-center bg-white rounded border border-slate-200 p-2">
+          <div class="w-full flex justify-between items-center text-[11px] mono mb-1">
+            <span class="text-slate-700 font-bold">WHAT IS HAPPENING INSIDE</span>
+            <span id="bg-process-live-pill" class="px-2 py-0.5 rounded bg-slate-100 text-emerald-700 font-semibold border border-slate-300">
+              Ready
+            </span>
+          </div>
+          <canvas id="bg-cutaway-canvas" width="320" height="95" class="w-full max-w-[320px] h-auto rounded bg-white"></canvas>
+        </div>
+
+        <div class="md:col-span-8 space-y-2 text-left">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#a4123f]" id="bg-process-stage-tag">
+              STEP 1 PROCESS: RESTING BRAIN CELLS &amp; BASELINE BLOOD FLOW
+            </span>
+            <span id="bg-progress-pct" class="mono text-xs font-bold text-slate-700">0%</span>
+          </div>
+          <p id="bg-process-description" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <strong>Mechanism:</strong> At rest, brain cells (neurons) use a steady baseline amount of oxygen. Tiny blood vessels (capillaries) carry a balanced mix of <strong class="text-red-600">oxygen-rich blood (Oxy-Hb)</strong> and <strong class="text-blue-600">oxygen-poor blood (Deoxy-Hb)</strong>.
+          </p>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+            <div id="bg-progress-bar" class="bg-[#a4123f] h-full transition-all duration-150" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== STAGE 2: LIVE CAPILLARY OXYGEN & BOLD SIGNAL SCOPE (HIDDEN UNTIL STEP 4 STIMULUS STARTS) ==================== -->
+    <section id="stage-2-boldscope" class="hidden bg-white rounded-lg border border-slate-300 p-4 space-y-3 stage-fade-in">
+      <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-200 pb-2.5">
+        <div class="text-left">
+          <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+            Live Capillary Oxygen Flow &amp; BOLD Signal Acquisition
+          </h3>
+          <p class="text-xs text-slate-500">
+            Observe how firing neurons trigger a surge of red Oxygen-Rich Blood (Oxy-Hb), causing the BOLD fMRI signal on the right to rise.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="inline-bold-status" class="mono text-xs text-[#a4123f] font-bold px-2.5 py-1 rounded bg-rose-50 border border-rose-200">
+            TASK ACTIVE (O₂ RUSH)
+          </span>
+          <button onclick="toggleTaskBurst()" id="burst-btn-inline" class="text-xs font-semibold bg-white hover:bg-slate-50 text-slate-800 px-3 py-1 rounded border border-slate-300 cursor-pointer transition">
+            Compare Rest vs. Task
+          </button>
+        </div>
+      </div>
+
+      <canvas 
+        id="bold-scope-inline" 
+        width="820" 
+        height="170" 
+        class="w-full h-auto block rounded bg-white border border-slate-200"
+      ></canvas>
+    </section>
+
+    <!-- ==================== STAGE 3: BRAIN ACTIVATION MAP & INTERPRETATION WORKSHEET (HIDDEN UNTIL SCAN COMPLETES) ==================== -->
+    <section id="stage-3-results" class="hidden space-y-4 stage-fade-in">
+      
+      <!-- Interactive Brain Map + Simple Noise Filter Card -->
+      <div class="bg-white rounded-lg border-2 border-emerald-600 p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-200 pb-3">
+          <div class="text-left">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block">
+              Scan Complete • Final Activation Mapping Result
+            </span>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900" id="results-header-title">
+              Interactive Brain Activation Map
+            </h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setSlicePlane('axial')" id="plane-axial" class="px-3 py-1.5 rounded bg-[#a4123f] text-white text-xs font-semibold cursor-pointer">
+              Top View (Axial)
+            </button>
+            <button onclick="setSlicePlane('sagittal')" id="plane-sagittal" class="px-3 py-1.5 rounded bg-white text-slate-700 border border-slate-300 text-xs font-semibold cursor-pointer">
+              Side View (Sagittal)
+            </button>
+            <button onclick="setSlicePlane('hrf')" id="plane-hrf" class="px-3 py-1.5 rounded bg-white text-slate-700 border border-slate-300 text-xs font-semibold cursor-pointer">
+              HRF Oxygen Curve
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+          <!-- Left: Interactive Brain Map Canvas on White (6 cols) -->
+          <div class="md:col-span-6 flex flex-col items-center justify-center bg-white p-2 rounded-lg border border-slate-200">
+            <canvas 
+              id="ocular-canvas" 
+              width="340" 
+              height="300" 
+              class="w-full max-w-[340px] h-auto rounded cursor-pointer bg-white"
+            ></canvas>
+            <div id="tapped-spot-banner" class="w-full text-xs bg-slate-50 text-slate-800 px-3 py-1.5 rounded border border-slate-200 text-center mt-2">
+              Click any glowing orange-red region on the brain above to inspect its role.
+            </div>
+          </div>
+
+          <!-- Right: Noise Filter & Beginner Interpretation (6 cols) -->
+          <div class="md:col-span-6 space-y-3.5 text-xs text-left">
+            <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+              <div class="flex justify-between items-center font-bold text-slate-800">
+                <span>Background Noise Filter:</span>
+                <span id="filter-level-label" class="mono text-emerald-700 font-bold">Medium (Clean Map)</span>
+              </div>
+              <input id="noise-filter-slider" type="range" min="1" max="3" step="1" value="2" oninput="updateSimpleFilter()" class="w-full h-2 accent-[#a4123f] cursor-pointer">
+              <p id="filter-helper-text" class="text-[11px] text-slate-600 leading-snug">
+                <strong>Medium Filter:</strong> Removes random background brain noise so only the active regions stand out clearly.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg bg-white border border-slate-300 space-y-2">
+              <div class="font-bold text-[#a4123f] uppercase text-xs" id="modal-region-header">Active Brain Region</div>
+              <p id="modal-region-text" class="text-slate-800 font-medium leading-relaxed text-xs sm:text-sm"></p>
+              <div class="bg-slate-50 p-3 rounded border border-slate-200 space-y-1 text-xs text-slate-600">
+                <div class="font-bold text-slate-800">Summary of the BOLD Effect:</div>
+                <div>1. <strong>Neurons Fire:</strong> Active brain cells consume oxygen during the task.</div>
+                <div>2. <strong>Fresh Blood Rush:</strong> Capillaries widen and deliver extra <span class="text-red-600 font-semibold">Oxygen-Rich Blood</span> (<span id="modal-bold-val" class="font-bold text-emerald-700">+2.6%</span>).</div>
+                <div>3. <strong>MRI Signal Boost:</strong> Oxygen-rich blood increases the MRI signal intensity.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worksheet & Observation Logbook (Only Shown in Stage 3) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        <div class="lg:col-span-7 bg-white rounded-lg border border-slate-300 p-4 space-y-3">
+          <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-2 border-b border-slate-200 pb-2">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-[#a4123f] shrink-0"></i>
+            Activated Regions Summary Table
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-700 border-b border-slate-300">
+                  <th class="p-2 font-semibold">Brain Region</th>
+                  <th class="p-2 font-semibold">Location</th>
+                  <th class="p-2 font-semibold">BOLD Boost</th>
+                  <th class="p-2 font-semibold">Function</th>
+                </tr>
+              </thead>
+              <tbody id="fmri-worksheet-body" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-white rounded-lg border border-slate-300 p-4 space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+            <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+              <i data-lucide="book-check" class="w-4 h-4 text-emerald-700 shrink-0"></i>
+              Observation Logbook
+            </h3>
+            <div class="flex gap-1.5">
+              <button onclick="downloadCSV()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-2.5 py-1 rounded flex items-center gap-1 cursor-pointer">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> CSV
+              </button>
+              <button onclick="downloadReportTXT()" class="bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs font-semibold px-2.5 py-1 rounded flex items-center gap-1 cursor-pointer">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Report
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-40">
+            <table class="w-full text-[11px] text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 text-slate-700 border-b border-slate-300">
+                  <th class="p-1.5 font-semibold">#</th>
+                  <th class="p-1.5 font-semibold">Task</th>
+                  <th class="p-1.5 font-semibold">Active Region</th>
+                  <th class="p-1.5 font-semibold">BOLD &Delta;%</th>
+                </tr>
+              </thead>
+              <tbody id="logbook-tbody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
 
   </main>
 
   <!-- ==================== FOOTER ==================== -->
-  <footer class="bg-white border-t border-slate-300 py-3 px-4 mt-6 text-center text-xs font-medium">
+  <footer class="bg-white border-t border-slate-200 py-3 px-4 mt-6 text-center text-xs font-medium">
     <span class="text-slate-500">&copy;Copyright 2026 </span>
     <span class="text-[#a4123f] font-semibold">Virtual Labs, Amrita Vishwa Vidyapeetham</span>
   </footer>
-
-  <!-- ==================== MOBILE-FIRST FIXED FULL-VIEWPORT MODAL (GLOWING BRAIN MAP / BOLD SCOPE / OXYGEN WAVE) ==================== -->
-  <div id="ocular-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-xs z-50 overflow-y-auto flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-white rounded-2xl max-w-3xl w-full p-3 sm:p-5 shadow-2xl border-2 border-slate-300 space-y-3 sm:space-y-4 my-auto max-h-[95dvh] overflow-y-auto">
-      
-      <!-- Modal Header -->
-      <div class="flex items-center justify-between border-b border-slate-200 pb-2.5 sticky top-0 bg-white z-10">
-        <div class="flex items-center gap-2 pr-2">
-          <i data-lucide="brain" class="w-5 h-5 text-[#a4123f] shrink-0"></i>
-          <h3 id="modal-title" class="font-bold text-slate-900 text-xs sm:text-base leading-tight">
-            Interactive Brain Activation Map &amp; Oxygen (BOLD) Viewer
-          </h3>
-        </div>
-        <button onclick="closeOcularModal()" class="shrink-0 bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-[#a4123f] px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">
-          &times; Close
-        </button>
-      </div>
-
-      <!-- Responsive Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 sm:gap-4 items-center">
-        
-        <!-- Left: Fluid Square Brain / BOLD Viewport -->
-        <div class="md:col-span-7 flex flex-col items-center justify-center bg-slate-950 p-2.5 sm:p-4 rounded-xl border border-slate-800 space-y-2">
-          
-          <!-- Brain View Switcher Pills (Shown in Brain Map Mode) -->
-          <div id="brainmap-toolbar" class="w-full flex flex-wrap items-center justify-between gap-1 text-[10px] sm:text-[11px]">
-            <div class="flex gap-1.5">
-              <button onclick="setSlicePlane('axial')" id="plane-axial" class="px-2.5 py-1 rounded bg-[#a4123f] text-white font-semibold cursor-pointer">Top-Down View</button>
-              <button onclick="setSlicePlane('sagittal')" id="plane-sagittal" class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 font-semibold cursor-pointer">Side View</button>
-            </div>
-            <span class="mono text-amber-300 text-[10px]">Tap any glowing spot!</span>
-          </div>
-
-          <!-- Capillary BOLD Scope Toolbar (Shown in BOLD Scope Mode) -->
-          <div id="boldscope-toolbar" class="hidden w-full flex flex-wrap items-center justify-between gap-1 text-[10px] sm:text-[11px]">
-            <span class="mono text-emerald-400 font-semibold">Neurovascular Coupling &amp; Capillary O₂ Flow</span>
-            <button onclick="toggleTaskBurst()" id="modal-burst-btn" class="px-2.5 py-1 rounded bg-rose-700 hover:bg-rose-600 text-white font-semibold cursor-pointer">
-              Toggle Activity ON/OFF
-            </button>
-          </div>
-
-          <!-- Responsive Square Canvas (320x320) -->
-          <div class="w-full flex justify-center">
-            <canvas 
-              id="ocular-canvas" 
-              width="320" 
-              height="320" 
-              class="w-full max-w-[260px] sm:max-w-[320px] h-auto aspect-square rounded-xl cursor-pointer border border-slate-800"
-            ></canvas>
-          </div>
-
-          <!-- Interactive Tap-to-Identify Brain Spot Banner -->
-          <div id="tapped-spot-banner" class="w-full text-[11px] bg-slate-900 text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-800 text-center leading-snug">
-            Tap any glowing orange-yellow spot on the brain above to see what that region controls.
-          </div>
-        </div>
-
-        <!-- Right: Beginner Noise Filter & Plain-English Explanation -->
-        <div class="md:col-span-5 space-y-3 text-xs">
-          
-          <!-- Simple Background Noise Filter Slider -->
-          <div id="noise-filter-panel" class="p-3 rounded-xl bg-slate-100 border border-slate-300 space-y-2">
-            <div class="flex justify-between items-center font-bold text-slate-800">
-              <span>Background Noise Filter:</span>
-              <span id="filter-level-label" class="mono text-emerald-700 font-bold">Medium (Clean Map)</span>
-            </div>
-            <input id="noise-filter-slider" type="range" min="1" max="3" step="1" value="2" oninput="updateSimpleFilter()" class="w-full h-2 accent-[#a4123f] cursor-pointer">
-            <p id="filter-helper-text" class="text-[11px] text-slate-600 leading-snug">
-              <strong>Medium Filter:</strong> Hides random background brain chatter so only the main working brain areas glow clearly.
-            </p>
-          </div>
-
-          <!-- Plain-English What Is Happening Box -->
-          <div class="p-3 sm:p-3.5 rounded-xl bg-rose-50/80 border border-rose-200 space-y-2">
-            <div class="font-bold text-[#a4123f] uppercase text-[11px]" id="modal-region-header">Active Brain Area</div>
-            <p id="modal-region-text" class="text-slate-800 font-medium leading-relaxed text-xs"></p>
-            <div class="bg-white p-2.5 rounded-lg border border-rose-200 space-y-1 text-[11px] text-slate-600">
-              <div class="font-bold text-slate-800">How the BOLD Signal Works in 3 Steps:</div>
-              <div>1. <strong>Neurons Fire:</strong> Active brain cells use up energy.</div>
-              <div>2. <strong>Oxygen Rush:</strong> Fresh <span class="text-red-600 font-semibold">oxygen-rich blood</span> floods the area (<span id="modal-bold-val" class="font-bold text-emerald-700">+2.6% boost</span>).</div>
-              <div>3. <strong>MRI Glow:</strong> Oxygen-rich blood boosts the magnetic signal!</div>
-            </div>
-          </div>
-
-          <!-- Quick Switcher Between All 3 Modal Views -->
-          <div class="grid grid-cols-3 gap-1.5 pt-1">
-            <button onclick="openOcularModal('brainmap')" class="bg-[#a4123f] hover:bg-[#830e32] text-white py-2 px-2 rounded-lg font-semibold text-[11px] cursor-pointer text-center">
-              Brain Map
-            </button>
-            <button onclick="openOcularModal('boldscope')" class="bg-emerald-700 hover:bg-emerald-800 text-white py-2 px-2 rounded-lg font-semibold text-[11px] cursor-pointer text-center">
-              BOLD Scope
-            </button>
-            <button onclick="openOcularModal('hrfwave')" class="bg-amber-600 hover:bg-amber-700 text-white py-2 px-2 rounded-lg font-semibold text-[11px] cursor-pointer text-center">
-              Oxygen Wave
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
 
   <!-- ==================== SIMULATION ENGINE JAVASCRIPT ==================== -->
   <script>
@@ -436,197 +362,195 @@
       reader.readAsDataURL(file);
     }
 
-    // ==================== BEGINNER-FRIENDLY BRAIN ACTIVITIES DATABASE ====================
+    // ==================== BRAIN TASKS DATABASE ====================
     const PARADIGMS = {
       motor: {
-        code: "MOVE",
-        name: "Moving Right-Hand Fingers",
-        stimulusType: "Tapping thumb and index finger on the right hand",
-        mainArea: "Left Motor Strip (Movement Center)",
-        side: "Left Side of Brain",
+        code: "M1-MOT",
+        name: "Right-Hand Finger Tapping",
+        stimulusType: "Rhythmic thumb-to-index finger tapping on the right hand",
+        mainArea: "Left Motor Cortex (M1)",
+        side: "Left Hemisphere (Opposite to Right Hand)",
         boldPct: 2.6,
-        simpleTakeaway: "The LEFT side of your brain controls movements on the RIGHT side of your body! When you tap your right fingers, fresh oxygen-rich blood rushes to the Left Motor Strip.",
+        simpleTakeaway: "Motor pathways cross from one side of the brain to the opposite side of the body: moving the right hand activates the Left Motor Cortex.",
         clusters: [
           {
-            roi: "Primary Motor Strip (Hand Area)",
-            location: "Left Top-Center (Frontal Lobe)",
-            bold: "+2.6% Oxygen",
-            role: "Sends direct signals to move the fingers on your opposite (right) hand.",
+            roi: "Primary Motor Cortex (M1 — Hand Area)",
+            location: "Left Frontal Lobe (Top-Left)",
+            bold: "+2.6% BOLD",
+            role: "Sends direct motor commands to move the fingers of the right hand.",
             strength: 3,
-            axX: 112, axY: 132, sagX: 148, sagY: 98, r: 26
+            axX: 122, axY: 125, sagX: 155, sagY: 92, r: 24
           },
           {
-            roi: "Movement Planning Area (SMA)",
-            location: "Top Middle of Brain",
-            bold: "+1.9% Oxygen",
-            role: "Plans and times the rhythm of your finger tapping.",
+            roi: "Supplementary Motor Area (SMA)",
+            location: "Top-Center Midline",
+            bold: "+1.9% BOLD",
+            role: "Plans and coordinates the timing of finger movements.",
             strength: 2,
-            axX: 160, axY: 112, sagX: 132, sagY: 92, r: 18
+            axX: 170, axY: 105, sagX: 138, sagY: 86, r: 17
           }
         ]
       },
       visual: {
-        code: "VISION",
-        name: "Looking at Flashing Patterns",
-        stimulusType: "Watching a black-and-white flashing checkerboard screen",
-        mainArea: "Visual Cortex (Seeing Center)",
-        side: "Back of Brain (Both Sides)",
+        code: "V1-VIS",
+        name: "Flashing Checkerboard Pattern",
+        stimulusType: "Viewing an 8 Hz black-and-white reversing checkerboard",
+        mainArea: "Primary Visual Cortex (V1)",
+        side: "Back of Brain (Occipital Lobe)",
         boldPct: 3.4,
-        simpleTakeaway: "Even though your eyes are at the front of your head, the brain's 'camera screen' (Visual Lobe) is at the very BACK of your head!",
+        simpleTakeaway: "Optic nerve signals travel from the eyes all the way to the Occipital Lobe at the very back of the head, where visual images are processed.",
         clusters: [
           {
-            roi: "Primary Visual Center (Occipital Lobe)",
-            location: "Very Back of Brain (Both Sides)",
-            bold: "+3.4% Oxygen",
-            role: "Receives light, shapes, and flashing patterns directly from your eyes.",
+            roi: "Primary Visual Cortex (V1 — Occipital Lobe)",
+            location: "Back of Brain (Both Sides)",
+            bold: "+3.4% BOLD",
+            role: "Processes light, contrast, edges, and visual patterns from the eyes.",
             strength: 3,
-            axX: 160, axY: 222, sagX: 228, sagY: 162, r: 30
+            axX: 170, axY: 212, sagX: 235, sagY: 152, r: 28
           },
           {
-            roi: "Pattern & Motion Area",
-            location: "Outer Back of Brain",
-            bold: "+2.5% Oxygen",
-            role: "Helps recognize moving edges and black-and-white contrast.",
+            roi: "Secondary Visual Area (V2 / V3)",
+            location: "Outer Back Lobe",
+            bold: "+2.5% BOLD",
+            role: "Analyzes visual shapes and motion.",
             strength: 2,
-            axX: 128, axY: 212, sagX: 210, sagY: 148, r: 20
+            axX: 138, axY: 202, sagX: 218, sagY: 138, r: 19
           }
         ]
       },
       auditory: {
-        code: "HEARING",
-        name: "Listening to Music & Tones",
-        stimulusType: "Hearing musical notes through MRI headphones",
-        mainArea: "Auditory Cortex (Hearing Center)",
+        code: "A1-AUD",
+        name: "Listening to Pure Tones",
+        stimulusType: "Hearing musical tones through MRI-safe headphones",
+        mainArea: "Auditory Cortex (Temporal Lobe)",
         side: "Both Sides (Above Ears)",
         boldPct: 2.5,
-        simpleTakeaway: "When you listen to sounds or music, the Temporal Lobes located right above both of your ears receive a rush of oxygenated blood.",
+        simpleTakeaway: "Sound waves from the ears activate the Auditory Cortex in the Temporal Lobes located just above both ears.",
         clusters: [
           {
-            roi: "Left Hearing Center (Temporal Lobe)",
-            location: "Left Side (Above Left Ear)",
-            bold: "+2.5% Oxygen",
-            role: "Processes sound pitch, volume, and spoken rhythm from the ears.",
+            roi: "Left Auditory Cortex (A1)",
+            location: "Left Temporal Lobe (Above Ear)",
+            bold: "+2.5% BOLD",
+            role: "Processes sound pitch, loudness, and rhythm.",
             strength: 3,
-            axX: 102, axY: 155, sagX: 160, sagY: 156, r: 23
+            axX: 112, axY: 148, sagX: 168, sagY: 148, r: 22
           },
           {
-            roi: "Right Hearing Center (Temporal Lobe)",
-            location: "Right Side (Above Right Ear)",
-            bold: "+2.4% Oxygen",
-            role: "Works together with the left side to process music and melody.",
+            roi: "Right Auditory Cortex (A1)",
+            location: "Right Temporal Lobe (Above Ear)",
+            bold: "+2.4% BOLD",
+            role: "Processes melody, harmony, and sound location.",
             strength: 3,
-            axX: 218, axY: 155, sagX: 160, sagY: 156, r: 23
+            axX: 228, axY: 148, sagX: 168, sagY: 148, r: 22
           }
         ]
       },
       language: {
-        code: "SPEECH",
-        name: "Thinking of Words Silently",
-        stimulusType: "Reading a noun (e.g., 'Ball') and silently thinking of an action ('Throw')",
-        mainArea: "Broca's & Wernicke's Speech Centers",
-        side: "Left Side of Brain",
+        code: "LNG-BRO",
+        name: "Silent Word Generation",
+        stimulusType: "Reading a noun and silently thinking of a matching verb",
+        mainArea: "Broca's & Wernicke's Speech Areas",
+        side: "Left Hemisphere",
         boldPct: 2.2,
-        simpleTakeaway: "For most people, language and speech live on the LEFT side of the brain. Surgeons use this scan to protect speech areas before brain surgery!",
+        simpleTakeaway: "In most individuals, speech and language centers are located in the Left Hemisphere. Neurosurgeons use fMRI to map and protect these areas before surgery.",
         clusters: [
           {
-            roi: "Broca's Area (Word Builder)",
-            location: "Left Front Side",
-            bold: "+2.2% Oxygen",
-            role: "Helps you form words and build sentences (even when thinking silently).",
+            roi: "Broca's Area (Speech Production)",
+            location: "Left Frontal Lobe (Front-Left)",
+            bold: "+2.2% BOLD",
+            role: "Formulates words and constructs sentences.",
             strength: 3,
-            axX: 108, axY: 106, sagX: 108, sagY: 130, r: 24
+            axX: 118, axY: 98, sagX: 115, sagY: 122, r: 23
           },
           {
-            roi: "Wernicke's Area (Word Meaning)",
-            location: "Left Back-Side",
-            bold: "+1.9% Oxygen",
-            role: "Helps you understand the meaning of words you read or hear.",
+            roi: "Wernicke's Area (Language Comprehension)",
+            location: "Left Temporal Lobe (Back-Left)",
+            bold: "+1.9% BOLD",
+            role: "Understands the meaning of spoken and written words.",
             strength: 2,
-            axX: 106, axY: 175, sagX: 185, sagY: 145, r: 20
+            axX: 116, axY: 168, sagX: 192, sagY: 138, r: 19
           }
         ]
       },
       memory: {
-        code: "THINK",
-        name: "Solving a Memory Puzzle",
-        stimulusType: "Remembering where shapes appeared 2 steps ago",
-        mainArea: "Prefrontal Cortex (Thinking & Memory Center)",
+        code: "WM-PFC",
+        name: "Short-Term Memory Puzzle",
+        stimulusType: "Remembering spatial positions from 2 steps earlier",
+        mainArea: "Prefrontal Cortex (Thinking Center)",
         side: "Front of Brain (Behind Forehead)",
         boldPct: 2.3,
-        simpleTakeaway: "When you concentrate hard or hold clues in your short-term memory, the front of your brain (right behind your forehead) works the hardest.",
+        simpleTakeaway: "Active concentration, problem-solving, and short-term working memory engage the Prefrontal Cortex right behind the forehead.",
         clusters: [
           {
-            roi: "Right Prefrontal Thinking Center",
+            roi: "Right Prefrontal Cortex (DLPFC)",
             location: "Right Front (Behind Forehead)",
-            bold: "+2.3% Oxygen",
-            role: "Acts like your brain's RAM—holding and comparing clues in short-term memory.",
+            bold: "+2.3% BOLD",
+            role: "Holds and updates clues in short-term working memory.",
             strength: 3,
-            axX: 196, axY: 96, sagX: 98, sagY: 108, r: 23
+            axX: 206, axY: 90, sagX: 105, sagY: 102, r: 22
           },
           {
-            roi: "Left Frontal Focus Area",
+            roi: "Left Prefrontal Cortex (DLPFC)",
             location: "Left Front (Behind Forehead)",
-            bold: "+2.0% Oxygen",
-            role: "Keeps your attention focused on solving the puzzle.",
+            bold: "+2.0% BOLD",
+            role: "Maintains focus and attention on the task.",
             strength: 2,
-            axX: 124, axY: 96, sagX: 98, sagY: 108, r: 20
+            axX: 134, axY: 90, sagX: 105, sagY: 102, r: 19
           }
         ]
       },
       dmn: {
-        code: "REST",
-        name: "Resting with Eyes Closed",
-        stimulusType: "Lying quietly with eyes closed and letting the mind wander",
-        mainArea: "Default Mode Network (Daydreaming Network)",
+        code: "DMN-RST",
+        name: "Eyes-Closed Resting State",
+        stimulusType: "Lying quietly with eyes closed and resting",
+        mainArea: "Default Mode Network (Midline)",
         side: "Center Midline of Brain",
         boldPct: 2.7,
-        simpleTakeaway: "Your brain never turns off! Even when you rest with your eyes closed, a special 'Daydreaming Network' down the middle of the brain lights up.",
+        simpleTakeaway: "Even when resting with eyes closed, the brain remains active: the Default Mode Network along the center midline synchronizes during daydreaming and rest.",
         clusters: [
           {
-            roi: "Posterior Cingulate (Daydreaming Hub)",
-            location: "Deep Center-Back of Brain",
-            bold: "+2.7% Oxygen",
-            role: "Turns on when you rest, daydream, or think about personal memories.",
+            roi: "Posterior Cingulate Cortex (PCC)",
+            location: "Center-Back Midline",
+            bold: "+2.7% BOLD",
+            role: "Core hub active during wakeful rest and personal memory recall.",
             strength: 3,
-            axX: 160, axY: 182, sagX: 185, sagY: 122, r: 26
+            axX: 170, axY: 175, sagX: 192, sagY: 115, r: 25
           },
           {
-            roi: "Medial Frontal Hub (Self-Reflection)",
-            location: "Center-Front of Brain",
-            bold: "+2.1% Oxygen",
-            role: "Active during quiet rest and thinking about yourself.",
+            roi: "Medial Prefrontal Cortex (mPFC)",
+            location: "Center-Front Midline",
+            bold: "+2.1% BOLD",
+            role: "Active during quiet self-reflection.",
             strength: 2,
-            axX: 160, axY: 88, sagX: 92, sagY: 122, r: 21
+            axX: 170, axY: 82, sagX: 98, sagY: 115, r: 20
           }
         ]
       }
     };
 
-    // ==================== INTERACTIVE SUITE & CAPILLARY BOLD SCOPE STATE ====================
+    // ==================== PROGRESSIVE DISCLOSURE STATE ====================
     let suiteState = {
-      step: 1,
+      taskSelected: false,
+      step: 1, // 1: Position Patient, 2: Lock RF Coil, 3: Move into Bore, 4: Start Task Stimulus, 5: Run BOLD Scan (reveals Results)
       animBusy: false,
-      paradigmKey: 'motor',
+      paradigmKey: '',
       bgProcessProgress: 0.0,
 
       subjectOnBed: false,
       coilLocked: false,
-      coilY: 105, // Lowers from 105 to 172
-      bedOffsetX: 0, // Slides from 0 to -185 into the 3T magnet bore
+      coilY: 88,
+      bedOffsetX: 0,
 
       stimulusActive: false,
       scanProgress: 0,
       scanRunning: false,
       scanCompleted: false,
 
-      // Capillary Oxygen Rush & BOLD Scope State
-      hyperemiaActive: false, // True when neurons are firing & fresh O2 blood rushes in
+      hyperemiaActive: false,
       capillaryCells: [],
       boldWaveHistory: new Array(195).fill(15),
 
-      // Modal State
-      activeModalMode: 'brainmap', // 'brainmap', 'boldscope', 'hrfwave'
-      slicePlane: 'axial',
+      slicePlane: 'axial', // 'axial', 'sagittal', 'hrf'
       noiseFilterLevel: 2,
       selectedClusterIdx: 0,
       logbook: []
@@ -634,226 +558,130 @@
 
     const STEP_INSTRUCTIONS = {
       1: {
-        tag: "STEP 1 OF 6 • PLACE VOLUNTEER ON THE MRI BED",
-        text: "Tap the MRI Patient Bed (or tap 'Perform Step 1') to help the volunteer lie down comfortably with hearing protection.",
-        btnLabel: "Perform Step 1: Position Volunteer",
+        tag: "STEP 1 OF 5 • POSITION PATIENT ON MRI TABLE",
+        text: "Click the MRI Patient Table on the diagram below (or click 'Step 1: Position Patient') to place the patient supine.",
+        btnLabel: "Step 1: Position Patient",
         targetId: "patientBed",
-        pointer: { x: 525, y: 155, label: "TAP MRI BED" },
-        bgStage: "STEP 1 BIO-PROCESS: RESTING BRAIN CELLS & BASELINE BLOOD FLOW",
-        bgDesc: "<strong>What happens inside the brain:</strong> Before the activity begins, brain cells (neurons) are resting quietly. Tiny blood vessels (capillaries) carry a steady, balanced mix of <strong class='text-red-400'>oxygen-rich blood</strong> and <strong class='text-blue-400'>oxygen-poor blood</strong>."
+        pointer: { x: 560, y: 150, label: "CLICK PATIENT TABLE" },
+        bgStage: "STEP 1 PROCESS: RESTING BRAIN CELLS & BASELINE BLOOD FLOW",
+        bgDesc: "<strong>Mechanism:</strong> At rest, brain cells (neurons) use a steady baseline amount of oxygen. Tiny blood vessels (capillaries) carry a balanced mix of <strong class='text-red-600'>oxygen-rich blood (Oxy-Hb)</strong> and <strong class='text-blue-600'>oxygen-poor blood (Deoxy-Hb)</strong>."
       },
       2: {
-        tag: "STEP 2 OF 6 • PUT ON THE BRAIN SENSOR HELMET (RF COIL)",
-        text: "Tap the Head Sensor Helmet (or tap 'Perform Step 2') to gently lower the 64-channel receiver helmet over the volunteer's head.",
-        btnLabel: "Perform Step 2: Lower Head Helmet",
+        tag: "STEP 2 OF 5 • SECURE RF HEAD COIL",
+        text: "Click the RF Head Coil (or click 'Step 2: Lock RF Head Coil') to lower the receiver coil over the patient's head.",
+        btnLabel: "Step 2: Lock RF Head Coil",
         targetId: "rfCoil",
-        pointer: { x: 435, y: 95, label: "TAP HEAD HELMET" },
-        bgStage: "STEP 2 BIO-PROCESS: RF ANTENNA COIL COUPLING",
-        bgDesc: "<strong>What happens inside the helmet:</strong> The birdcage <strong>RF Head Helmet</strong> surrounds the head like a close-up radio antenna. Its copper rungs are tuned to pick up tiny magnetic echoes from water molecules inside the brain's blood vessels."
+        pointer: { x: 455, y: 78, label: "CLICK RF HEAD COIL" },
+        bgStage: "STEP 2 PROCESS: RF RECEIVER COIL ALIGNMENT",
+        bgDesc: "<strong>Mechanism:</strong> The birdcage <strong>RF Head Coil</strong> surrounds the patient's head like a sensitive radio antenna to detect tiny magnetic signals from water molecules inside the brain."
       },
       3: {
-        tag: "STEP 3 OF 6 • GLIDE BED INTO THE 3.0T MAGNET TUNNEL",
-        text: "Tap the Green Scanner Button (or tap 'Perform Step 3') to smoothly glide the volunteer into the center of the 3.0 Tesla magnet.",
-        btnLabel: "Perform Step 3: Move Into Magnet",
+        tag: "STEP 3 OF 5 • ADVANCE TABLE INTO 3.0T MAGNET BORE",
+        text: "Click the Gantry Control Button (or click 'Step 3: Move Into Magnet') to advance the patient into the 3.0T MRI magnet.",
+        btnLabel: "Step 3: Move Into Magnet",
         targetId: "gantryBtn",
-        pointer: { x: 315, y: 85, label: "TAP SCANNER BUTTON" },
-        bgStage: "STEP 3 BIO-PROCESS: 3.0 TESLA MAGNETIC SPIN ALIGNMENT",
-        bgDesc: "<strong>What happens inside the magnet tunnel:</strong> Inside the <strong>3.0 Tesla magnetic field</strong> (60,000× stronger than Earth's gravity field!), hydrogen protons in the brain's water molecules line up like tiny compass needles pointing in the same direction."
+        pointer: { x: 345, y: 80, label: "CLICK GANTRY BUTTON" },
+        bgStage: "STEP 3 PROCESS: 3.0 TESLA MAGNETIC ALIGNMENT",
+        bgDesc: "<strong>Mechanism:</strong> Inside the strong <strong>3.0 Tesla magnetic field</strong>, hydrogen protons in the brain's water molecules line up in the same direction like tiny compass needles."
       },
       4: {
-        tag: "STEP 4 OF 6 • TURN ON THE ACTIVITY PROJECTOR",
-        text: "Tap the Activity Projector (or tap 'Perform Step 4') so the volunteer starts performing the task inside the scanner!",
-        btnLabel: "Perform Step 4: Start Activity",
+        tag: "STEP 4 OF 5 • START TASK STIMULUS PROJECTOR",
+        text: "Click the newly revealed Stimulus Projector (or click 'Step 4: Start Task Stimulus') so the patient begins performing the task.",
+        btnLabel: "Step 4: Start Task Stimulus",
         targetId: "projector",
-        pointer: { x: 695, y: 55, label: "TAP PROJECTOR" },
-        bgStage: "STEP 4 BIO-PROCESS: NEURAL FIRING & ENERGY DEMAND",
-        bgDesc: "<strong>What happens when the activity starts:</strong> As soon as the volunteer starts the task, thousands of <strong>neurons</strong> in the responsible brain region fire electrical sparks! They immediately demand fresh energy (glucose and oxygen) from nearby blood vessels."
+        pointer: { x: 715, y: 48, label: "CLICK PROJECTOR" },
+        bgStage: "STEP 4 PROCESS: NEURON FIRING & ENERGY DEMAND",
+        bgDesc: "<strong>Mechanism:</strong> Neurons in the active brain region fire electrical signals rapidly and demand fresh oxygen and energy from nearby blood vessels."
       },
       5: {
-        tag: "STEP 5 OF 6 • RUN THE fMRI OXYGEN (BOLD) SCAN",
-        text: "Tap the Left Computer Screen (or tap 'Perform Step 5') to record the rush of fresh oxygen-rich blood (the BOLD wave) over time.",
-        btnLabel: "Perform Step 5: Run Oxygen Scan",
+        tag: "STEP 5 OF 5 • ACQUIRE fMRI OXYGEN (BOLD) SCAN",
+        text: "Click the newly revealed BOLD Acquisition Monitor (or click 'Step 5: Acquire fMRI Scan') to record the oxygen rush and generate the Brain Map.",
+        btnLabel: "Step 5: Acquire fMRI Scan",
         targetId: "epiMonitor",
-        pointer: { x: 885, y: 155, label: "TAP LEFT SCREEN" },
-        bgStage: "STEP 5 BIO-PROCESS: OXYGEN RUSH & MAGNETIC GLOW (THE BOLD EFFECT)",
-        bgDesc: "<strong>What happens during the scan:</strong> Capillaries widen and send a surge of bright red <strong>Oxygen-Rich Blood (Oxy-Hb, non-magnetic)</strong> that flushes out dark blue <strong>Oxygen-Poor Blood (Deoxy-Hb, magnetic)</strong>. With less magnetic interference, the fMRI signal glows brighter!"
+        pointer: { x: 925, y: 120, label: "CLICK SCAN MONITOR" },
+        bgStage: "STEP 5 PROCESS: OXYGEN RUSH & BOLD SIGNAL INCREASE",
+        bgDesc: "<strong>Mechanism:</strong> Capillaries widen and deliver a surge of bright red <strong class='text-red-600'>Oxygen-Rich Blood (Oxy-Hb)</strong> that flushes out <strong class='text-blue-600'>Oxygen-Poor Blood (Deoxy-Hb)</strong>, making the MRI signal brighter!"
       },
       6: {
-        tag: "STEP 6 OF 6 • EXPLORE THE GLOWING BRAIN MAP!",
-        text: "Tap the Right Computer Screen (or tap 'Open Brain Map') to inspect the glowing brain regions, filter out noise, and export your results!",
-        btnLabel: "Open Glowing Brain Map",
-        targetId: "glmMonitor",
-        pointer: { x: 1035, y: 155, label: "TAP BRAIN MAP" },
-        bgStage: "STEP 6 BIO-PROCESS: BRAIN ACTIVATION MAPPING COMPLETE",
-        bgDesc: "<strong>Experiment Complete:</strong> The computer compares the brain's oxygen signal during <strong>ACTIVITY</strong> vs. <strong>REST</strong> and paints the exact working brain region in bright orange-yellow on the 3D brain map!"
+        tag: "EXPERIMENT COMPLETE • EXPLORE BRAIN ACTIVATION MAP BELOW",
+        text: "Scroll down to inspect the newly revealed Brain Activation Map, adjust the Noise Filter, or select another Brain Task above to compare.",
+        btnLabel: "Scan Complete",
+        targetId: "",
+        pointer: null,
+        bgStage: "STEP 6 PROCESS: ACTIVATION MAPPING COMPLETE",
+        bgDesc: "<strong>Analysis Complete:</strong> By comparing the MRI signal during <strong>TASK</strong> vs. <strong>REST</strong>, the computer highlights the exact brain regions that controlled the activity."
       }
     };
 
-    const HITBOXES = [
-      { id: 'patientBed', x: 395, y: 150, w: 270, h: 165, name: "MRI Volunteer Bed" },
-      { id: 'rfCoil', x: 385, y: 85, w: 95, h: 120, name: "Brain Sensor Helmet (RF Head Coil)" },
-      { id: 'gantryBtn', x: 260, y: 70, w: 100, h: 100, name: "MRI Bed Move Button" },
-      { id: 'projector', x: 640, y: 30, w: 110, h: 90, name: "Activity Screen Projector" },
-      { id: 'epiMonitor', x: 810, y: 140, w: 140, h: 135, name: "Oxygen Signal (BOLD) Scanner Screen" },
-      { id: 'glmMonitor', x: 960, y: 140, w: 145, h: 135, name: "Glowing Brain Map Screen" }
-    ];
+    // ==================== MANDATORY TASK SELECTION & PROGRESSIVE REVEAL ====================
+    function onMandatoryTaskSelected() {
+      const val = document.getElementById('paradigm-select').value;
+      if (!val) return;
+
+      suiteState.paradigmKey = val;
+      suiteState.taskSelected = true;
+
+      // Update Stage 0 Card appearance & reveal Reset button + Stage 1 Scanner Setup
+      const task = PARADIGMS[val];
+      document.getElementById('stage-0-subtext').innerHTML = 
+        `Selected Paradigm: <strong class="text-[#a4123f]">${task.name}</strong> — Expected Target: <strong>${task.mainArea}</strong>.`;
+      document.getElementById('reset-btn').classList.remove('hidden');
+      document.getElementById('reset-btn').classList.add('inline-flex');
+
+      // Reset steps to Step 1 and show Stage 1
+      resetStepsForSelectedTask();
+      document.getElementById('stage-1-scanner').classList.remove('hidden');
+    }
+
+    function resetStepsForSelectedTask() {
+      suiteState.step = 1;
+      suiteState.animBusy = false;
+      setBgProgress(0);
+      suiteState.subjectOnBed = false;
+      suiteState.coilLocked = false;
+      suiteState.coilY = 88;
+      suiteState.bedOffsetX = 0;
+      suiteState.stimulusActive = false;
+      suiteState.scanProgress = 0;
+      suiteState.scanRunning = false;
+      suiteState.scanCompleted = false;
+      suiteState.hyperemiaActive = false;
+      suiteState.selectedClusterIdx = 0;
+
+      // Hide Stage 2 & Stage 3 until the student reaches those steps!
+      document.getElementById('stage-2-boldscope').classList.add('hidden');
+      document.getElementById('stage-3-results').classList.add('hidden');
+
+      document.getElementById('bg-process-live-pill').textContent = "Ready";
+      const quickBtn = document.getElementById('quick-step-btn');
+      quickBtn.disabled = false;
+      quickBtn.classList.remove('opacity-50', 'hidden');
+
+      initCapillaryCells();
+      updateBannerUI();
+    }
+
+    function resetToInitialStage() {
+      suiteState.taskSelected = false;
+      suiteState.paradigmKey = '';
+      document.getElementById('paradigm-select').value = '';
+      document.getElementById('stage-0-subtext').textContent = 
+        "Please select a cognitive or sensory brain task from the dropdown menu to unlock the MRI scanner setup.";
+      document.getElementById('reset-btn').classList.add('hidden');
+      document.getElementById('reset-btn').classList.remove('inline-flex');
+
+      // Hide all downstream stages
+      document.getElementById('stage-1-scanner').classList.add('hidden');
+      document.getElementById('stage-2-boldscope').classList.add('hidden');
+      document.getElementById('stage-3-results').classList.add('hidden');
+    }
 
     function triggerCurrentStepAction() {
-      if (suiteState.animBusy) return;
+      if (!suiteState.taskSelected || suiteState.animBusy) return;
       const info = STEP_INSTRUCTIONS[suiteState.step];
       if (info && info.targetId) {
         handleApparatusClick(info.targetId);
       }
-    }
-
-    // ==================== CAPILLARY OXYGEN RUSH & BOLD WAVE SCOPE ENGINE ====================
-    function initCapillaryCells() {
-      suiteState.capillaryCells = [];
-      for (let i = 0; i < 26; i++) {
-        suiteState.capillaryCells.push({
-          x: Math.random() * 180,
-          y: 72 + (Math.random() - 0.5) * 24,
-          speed: 0.75 + Math.random() * 0.45,
-          isOxy: Math.random() < 0.55
-        });
-      }
-    }
-
-    function toggleTaskBurst() {
-      suiteState.hyperemiaActive = !suiteState.hyperemiaActive;
-      updateBoldScopeUI();
-    }
-
-    function updateBoldScopeUI() {
-      const statusEl = document.getElementById('inline-bold-status');
-      const inlineBtn = document.getElementById('burst-btn-inline');
-      if (suiteState.hyperemiaActive) {
-        statusEl.textContent = "O₂ RUSH (ACTIVE)";
-        statusEl.className = "mono text-[10px] text-rose-400 font-bold shrink-0 ml-2";
-        inlineBtn.textContent = "Return to Rest";
-        inlineBtn.className = "text-[10px] font-semibold bg-rose-700 hover:bg-rose-600 text-white px-2 py-1 rounded border border-rose-500 cursor-pointer transition";
-      } else {
-        statusEl.textContent = "RESTING BASELINE";
-        statusEl.className = "mono text-[10px] text-emerald-400 font-bold shrink-0 ml-2";
-        inlineBtn.textContent = "Trigger O₂ Rush";
-        inlineBtn.className = "text-[10px] font-semibold bg-slate-800 hover:bg-rose-900 text-amber-300 px-2 py-1 rounded border border-slate-700 cursor-pointer transition";
-      }
-    }
-
-    function stepCapillaryBoldPhysics() {
-      const task = PARADIGMS[suiteState.paradigmKey];
-      const isBurst = suiteState.hyperemiaActive;
-      const flowSpeedMult = isBurst ? 1.65 : 0.85;
-      const oxyProbability = isBurst ? 0.92 : 0.48;
-
-      suiteState.capillaryCells.forEach(c => {
-        c.x += c.speed * flowSpeedMult;
-        if (c.x > 180) {
-          c.x = 4;
-          c.y = 72 + (Math.random() - 0.5) * (isBurst ? 34 : 20);
-          c.isOxy = Math.random() < oxyProbability;
-        }
-      });
-
-      const lastVal = suiteState.boldWaveHistory[suiteState.boldWaveHistory.length - 1] || 18;
-      const targetVal = isBurst ? 45 + task.boldPct * 34 : 18;
-      const nextVal = lastVal + (targetVal - lastVal) * 0.06 + (Math.random() - 0.5) * 3.2;
-      suiteState.boldWaveHistory.push(nextVal);
-      if (suiteState.boldWaveHistory.length > 195) {
-        suiteState.boldWaveHistory.shift();
-      }
-    }
-
-    function drawBoldScopeOnCanvas(canvas) {
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width;
-      const H = canvas.height;
-      const task = PARADIGMS[suiteState.paradigmKey];
-      const isBurst = suiteState.hyperemiaActive;
-      ctx.clearRect(0, 0, W, H);
-
-      const splitX = Math.round(W * 0.45);
-
-      // Left Half: Brain Capillary & Firing Neurons
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, splitX, H);
-
-      // Firing Neurons Above Capillary
-      for (let n = 0; n < 3; n++) {
-        const nx = (splitX * 0.22) + n * (splitX * 0.28);
-        const ny = H * 0.22;
-        ctx.fillStyle = isBurst ? '#fde047' : '#475569';
-        ctx.beginPath();
-        ctx.arc(nx, ny, isBurst ? 7 : 5, 0, Math.PI * 2);
-        ctx.fill();
-        if (isBurst && Math.random() < 0.5) {
-          ctx.strokeStyle = 'rgba(253, 224, 71, 0.5)';
-          ctx.beginPath();
-          ctx.arc(nx, ny, 12, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-      }
-
-      // Capillary Vessel Walls (Dilates during O2 Rush!)
-      const vesselHalfH = isBurst ? 24 : 15;
-      const vesselY = H * 0.54;
-      ctx.fillStyle = 'rgba(225, 29, 72, 0.16)';
-      ctx.fillRect(0, vesselY - vesselHalfH, splitX, vesselHalfH * 2);
-      ctx.strokeStyle = isBurst ? '#fb7185' : '#64748b';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, vesselY - vesselHalfH); ctx.lineTo(splitX, vesselY - vesselHalfH);
-      ctx.moveTo(0, vesselY + vesselHalfH); ctx.lineTo(splitX, vesselY + vesselHalfH);
-      ctx.stroke();
-
-      // Flowing Red (Oxy-Hb) vs Blue (Deoxy-Hb) RBCs inside Capillary
-      const scaleX = splitX / 180;
-      const scaleY = H / 175;
-      suiteState.capillaryCells.forEach(c => {
-        ctx.beginPath();
-        ctx.arc(c.x * scaleX, c.y * scaleY + (vesselY - 72 * scaleY), 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = c.isOxy ? '#ef4444' : '#3b82f6';
-        ctx.fill();
-      });
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.font = 'bold 9px JetBrains Mono, monospace';
-      ctx.fillText(isBurst ? 'NEURONS FIRING (ON)' : 'NEURONS AT REST', 8, 14);
-      ctx.fillStyle = '#ef4444';
-      ctx.fillText('● Oxy-Hb', 8, H - 8);
-      ctx.fillStyle = '#3b82f6';
-      ctx.fillText('● Deoxy-Hb', 64, H - 8);
-
-      // Right Half: Live BOLD Signal Wave Oscilloscope
-      ctx.fillStyle = '#020617';
-      ctx.fillRect(splitX + 4, 0, W - splitX - 4, H);
-
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 1;
-      for (let gy = 25; gy < H; gy += 32) {
-        ctx.beginPath();
-        ctx.moveTo(splitX + 6, gy);
-        ctx.lineTo(W - 4, gy);
-        ctx.stroke();
-      }
-
-      const traceW = W - splitX - 14;
-      const baseLineY = H - 14;
-      ctx.strokeStyle = isBurst ? '#f43f5e' : '#10b981';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      suiteState.boldWaveHistory.forEach((val, idx) => {
-        const tx = splitX + 8 + (idx / suiteState.boldWaveHistory.length) * traceW;
-        const ty = baseLineY - Math.min(H - 28, (val / 155) * (H - 28));
-        if (idx === 0) ctx.moveTo(tx, ty);
-        else ctx.lineTo(tx, ty);
-      });
-      ctx.stroke();
-
-      ctx.fillStyle = '#34d399';
-      ctx.font = 'bold 9px JetBrains Mono, monospace';
-      ctx.fillText(`BOLD Signal (+${task.boldPct}% O₂)`, splitX + 12, 14);
     }
 
     function setBgProgress(pct) {
@@ -865,510 +693,680 @@
 
     function updateBannerUI() {
       const info = STEP_INSTRUCTIONS[suiteState.step];
-      document.getElementById('step-number-circle').textContent = suiteState.step;
+      document.getElementById('step-number-circle').textContent = Math.min(5, suiteState.step);
       document.getElementById('step-header-tag').textContent = info.tag;
       document.getElementById('instruction-banner-text').textContent = info.text;
       document.getElementById('quick-step-btn-text').textContent = info.btnLabel;
-      document.getElementById('bg-process-stage-tag').innerHTML = `<i data-lucide="sparkles" class="w-4 h-4 text-rose-400 shrink-0"></i> ${info.bgStage}`;
+      document.getElementById('bg-process-stage-tag').textContent = info.bgStage;
       document.getElementById('bg-process-description').innerHTML = info.bgDesc;
-      lucide.createIcons();
-      renderWorksheetTable();
+
+      if (suiteState.step === 6) {
+        document.getElementById('quick-step-btn').classList.add('hidden');
+      }
     }
 
-    function changeParadigm() {
-      suiteState.paradigmKey = document.getElementById('paradigm-select').value;
-      resetScannerSuite();
+    // ==================== CAPILLARY OXYGEN & BOLD SCOPE ENGINE ====================
+    function initCapillaryCells() {
+      suiteState.capillaryCells = [];
+      for (let i = 0; i < 24; i++) {
+        suiteState.capillaryCells.push({
+          x: Math.random() * 180,
+          y: 72 + (Math.random() - 0.5) * 20,
+          speed: 0.7 + Math.random() * 0.4,
+          isOxy: Math.random() < 0.55
+        });
+      }
     }
 
-    function resetScannerSuite() {
-      suiteState.step = 1;
-      suiteState.animBusy = false;
-      setBgProgress(0);
-      suiteState.subjectOnBed = false;
-      suiteState.coilLocked = false;
-      suiteState.coilY = 105;
-      suiteState.bedOffsetX = 0;
-      suiteState.stimulusActive = false;
-      suiteState.scanProgress = 0;
-      suiteState.scanRunning = false;
-      suiteState.scanCompleted = false;
-      suiteState.hyperemiaActive = false;
-      suiteState.selectedClusterIdx = 0;
-      document.getElementById('bg-process-live-pill').textContent = "Ready";
-      document.getElementById('quick-step-btn').disabled = false;
-      document.getElementById('quick-step-btn').classList.remove('opacity-50');
-      updateBoldScopeUI();
-      initCapillaryCells();
-      closeOcularModal();
-      document.getElementById('scan-status-badge').textContent = "Scanner Ready";
-      document.getElementById('scan-status-badge').className = "text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-300";
-      updateBannerUI();
+    function toggleTaskBurst() {
+      suiteState.hyperemiaActive = !suiteState.hyperemiaActive;
+      const statusEl = document.getElementById('inline-bold-status');
+      if (suiteState.hyperemiaActive) {
+        statusEl.textContent = "TASK ACTIVE (O₂ RUSH)";
+        statusEl.className = "mono text-xs text-[#a4123f] font-bold px-2.5 py-1 rounded bg-rose-50 border border-rose-200";
+      } else {
+        statusEl.textContent = "RESTING BASELINE";
+        statusEl.className = "mono text-xs text-emerald-700 font-bold px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200";
+      }
     }
 
-    // ==================== DEDICATED RESPONSIVE BACKGROUND CUTAWAY CANVAS RENDERER ====================
+    function stepCapillaryBoldPhysics() {
+      if (!suiteState.taskSelected) return;
+      const task = PARADIGMS[suiteState.paradigmKey];
+      const isBurst = suiteState.hyperemiaActive;
+      const flowSpeedMult = isBurst ? 1.55 : 0.85;
+      const oxyProbability = isBurst ? 0.92 : 0.48;
+
+      suiteState.capillaryCells.forEach(c => {
+        c.x += c.speed * flowSpeedMult;
+        if (c.x > 180) {
+          c.x = 4;
+          c.y = 72 + (Math.random() - 0.5) * (isBurst ? 28 : 18);
+          c.isOxy = Math.random() < oxyProbability;
+        }
+      });
+
+      const lastVal = suiteState.boldWaveHistory[suiteState.boldWaveHistory.length - 1] || 18;
+      const targetVal = isBurst ? 45 + task.boldPct * 34 : 18;
+      const nextVal = lastVal + (targetVal - lastVal) * 0.06 + (Math.random() - 0.5) * 2.5;
+      suiteState.boldWaveHistory.push(nextVal);
+      if (suiteState.boldWaveHistory.length > 195) {
+        suiteState.boldWaveHistory.shift();
+      }
+    }
+
+    function drawBoldScopeOnCanvas(canvas) {
+      if (!canvas || !suiteState.taskSelected) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+      const task = PARADIGMS[suiteState.paradigmKey];
+      const isBurst = suiteState.hyperemiaActive;
+      ctx.clearRect(0, 0, W, H);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      const splitX = Math.round(W * 0.44);
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(splitX, 0);
+      ctx.lineTo(splitX, H);
+      ctx.stroke();
+
+      // Left Half: Capillary & Neurons on White
+      for (let n = 0; n < 4; n++) {
+        const nx = (splitX * 0.18) + n * (splitX * 0.22);
+        const ny = H * 0.26;
+        ctx.fillStyle = isBurst ? '#f59e0b' : '#94a3b8';
+        ctx.beginPath();
+        ctx.arc(nx, ny, isBurst ? 6 : 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        if (isBurst) {
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(nx, ny, 10, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      const vesselHalfH = isBurst ? 22 : 14;
+      const vesselY = H * 0.56;
+      ctx.fillStyle = '#fff1f2';
+      ctx.fillRect(8, vesselY - vesselHalfH, splitX - 16, vesselHalfH * 2);
+      ctx.strokeStyle = isBurst ? '#e11d48' : '#64748b';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(8, vesselY - vesselHalfH); ctx.lineTo(splitX - 8, vesselY - vesselHalfH);
+      ctx.moveTo(8, vesselY + vesselHalfH); ctx.lineTo(splitX - 8, vesselY + vesselHalfH);
+      ctx.stroke();
+
+      const scaleX = (splitX - 16) / 180;
+      const scaleY = H / 175;
+      suiteState.capillaryCells.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(8 + c.x * scaleX, c.y * scaleY + (vesselY - 72 * scaleY), 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = c.isOxy ? '#dc2626' : '#2563eb';
+        ctx.fill();
+      });
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#334155';
+      ctx.font = 'bold 10px Inter, sans-serif';
+      ctx.fillText(isBurst ? 'NEURONS FIRING (ON)' : 'NEURONS AT REST', splitX / 2, 13);
+
+      ctx.fillStyle = '#dc2626';
+      ctx.fillText('● Oxy-Hb (Fresh O₂)', splitX * 0.3, H - 11);
+      ctx.fillStyle = '#2563eb';
+      ctx.fillText('● Deoxy-Hb (Used)', splitX * 0.72, H - 11);
+      ctx.restore();
+
+      // Right Half: Live BOLD Signal Trace
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      for (let gy = 28; gy < H - 18; gy += 28) {
+        ctx.beginPath();
+        ctx.moveTo(splitX + 8, gy);
+        ctx.lineTo(W - 8, gy);
+        ctx.stroke();
+      }
+
+      const traceW = W - splitX - 20;
+      const baseLineY = H - 20;
+      ctx.strokeStyle = isBurst ? '#a4123f' : '#059669';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      suiteState.boldWaveHistory.forEach((val, idx) => {
+        const tx = splitX + 10 + (idx / suiteState.boldWaveHistory.length) * traceW;
+        const ty = baseLineY - Math.min(H - 36, (val / 155) * (H - 36));
+        if (idx === 0) ctx.moveTo(tx, ty);
+        else ctx.lineTo(tx, ty);
+      });
+      ctx.stroke();
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 10px JetBrains Mono, monospace';
+      ctx.fillText(`Live BOLD Signal Wave (+${task.boldPct}% Boost in ${task.mainArea})`, splitX + (W - splitX) / 2, 13);
+      ctx.restore();
+    }
+
+    // ==================== DEDICATED CUTAWAY CANVAS RENDERER (ON PURE WHITE) ====================
     function renderBgCutawayCanvas(task) {
       const c = document.getElementById('bg-cutaway-canvas');
       if (!c) return;
       const ctx = c.getContext('2d');
-      ctx.clearRect(0, 0, c.width, c.height);
+      const W = c.width, H = c.height;
+      ctx.clearRect(0, 0, W, H);
 
-      ctx.fillStyle = '#090d16';
-      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
       if (suiteState.step === 1) {
-        // Resting Neurons & Balanced Capillary Blood
-        ctx.fillStyle = '#475569';
+        ctx.fillStyle = '#64748b';
         for (let n = 0; n < 4; n++) {
           ctx.beginPath();
-          ctx.arc(55 + n * 70, 32, 8, 0, Math.PI * 2);
+          ctx.arc(55 + n * 70, 36, 6.5, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.2)';
-        ctx.fillRect(15, 62, 290, 24);
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.fillRect(16, 56, 288, 24);
+        ctx.strokeRect(16, 56, 288, 24);
         for (let b = 0; b < 10; b++) {
-          ctx.fillStyle = b % 2 === 0 ? '#ef4444' : '#3b82f6';
+          ctx.fillStyle = b % 2 === 0 ? '#dc2626' : '#2563eb';
           ctx.beginPath();
-          ctx.arc(28 + ((b * 28 + Date.now() * 0.02) % 265), 74, 5, 0, Math.PI * 2);
+          ctx.arc(28 + ((b * 28 + Date.now() * 0.02) % 264), 68, 4.5, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = 'bold 10px JetBrains Mono, monospace';
-        ctx.fillText('Resting Neurons • Balanced O₂ Blood Flow', 22, 16);
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.fillText('Resting State: Balanced Oxy-Hb & Deoxy-Hb', W / 2, 14);
       }
 
       else if (suiteState.step === 2) {
-        // RF Head Helmet Antenna Waves Coupling with Brain
-        ctx.fillStyle = '#334155';
-        ctx.beginPath();
-        ctx.ellipse(160, 62, 48, 34, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(98, 22, 124, 76);
-
-        const waveR = 16 + ((Date.now() * 0.04) % 38);
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.strokeStyle = '#64748b';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(160, 62, waveR, 0, Math.PI * 2);
+        ctx.ellipse(W / 2, 58, 42, 26, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 10px JetBrains Mono, monospace';
-        ctx.fillText('64-Ch RF Helmet Tuned to Brain Water Signals', 22, 16);
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(104, 26, 112, 62);
+
+        const waveR = 14 + ((Date.now() * 0.04) % 30);
+        ctx.strokeStyle = 'rgba(2, 132, 199, 0.55)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(W / 2, 58, waveR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#0284c7';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.fillText('RF Head Coil Coupled to Brain Tissue', W / 2, 14);
       }
 
       else if (suiteState.step === 3) {
-        // 3.0T Magnetic Field Aligning Water Protons
         const alignRatio = suiteState.bedOffsetX <= -180 ? 1.0 : suiteState.bgProcessProgress;
-        ctx.strokeStyle = 'rgba(14, 165, 233, 0.35)';
-        ctx.lineWidth = 2;
-        for (let y = 32; y <= 92; y += 20) {
-          ctx.beginPath(); ctx.moveTo(15, y); ctx.lineTo(305, y); ctx.stroke();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1.5;
+        for (let y = 38; y <= 80; y += 21) {
+          ctx.beginPath(); ctx.moveTo(16, y); ctx.lineTo(304, y); ctx.stroke();
         }
 
         for (let p = 0; p < 12; p++) {
-          const px = 38 + (p % 6) * 48;
-          const py = 42 + Math.floor(p / 6) * 36;
+          const px = 42 + (p % 6) * 47;
+          const py = 45 + Math.floor(p / 6) * 30;
           const randomAngle = (p * 1.7) * (1 - alignRatio);
           ctx.save();
           ctx.translate(px, py);
           ctx.rotate(randomAngle);
-          ctx.fillStyle = '#38bdf8';
-          ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#fde047';
+          ctx.fillStyle = '#0284c7';
+          ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#a4123f';
           ctx.lineWidth = 2;
-          ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(8, 0); ctx.stroke();
           ctx.restore();
         }
-        ctx.fillStyle = '#fde047';
-        ctx.font = 'bold 10px JetBrains Mono, monospace';
-        ctx.fillText('B₀ = 3.0 Tesla: Protons Align Like Compasses', 22, 16);
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.fillText('3.0T Magnetic Field: Protons Align Parallel', W / 2, 14);
       }
 
       else if (suiteState.step === 4) {
-        // Neurons Firing Electrical Sparks on Task Start
         for (let n = 0; n < 5; n++) {
-          const nx = 45 + n * 56;
-          const ny = 58;
-          ctx.fillStyle = '#fde047';
-          ctx.beginPath(); ctx.arc(nx, ny, 9, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = 'rgba(250, 204, 21, 0.6)';
-          ctx.lineWidth = 2;
+          const nx = 48 + n * 56;
+          const ny = 56;
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath(); ctx.arc(nx, ny, 7.5, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.55)';
+          ctx.lineWidth = 1.8;
           ctx.beginPath();
-          ctx.arc(nx, ny, 12 + ((Date.now() * 0.05 + n * 5) % 14), 0, Math.PI * 2);
+          ctx.arc(nx, ny, 11 + ((Date.now() * 0.05 + n * 5) % 12), 0, Math.PI * 2);
           ctx.stroke();
         }
-        ctx.fillStyle = '#fde047';
-        ctx.font = 'bold 10px JetBrains Mono, monospace';
-        ctx.fillText(`Neurons Firing in ${task.mainArea.split(' ')[0]} Lobe!`, 22, 18);
+        ctx.fillStyle = '#b45309';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.fillText(`Neurons Firing in ${task.mainArea}`, W / 2, 14);
       }
 
       else {
-        // Step 5 & 6: Capillary Dilation & Oxygen-Rich Blood Rush (BOLD Glow)
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
-        ctx.fillRect(15, 38, 290, 42);
-        ctx.strokeStyle = '#f43f5e';
-        ctx.lineWidth = 2.5;
-        ctx.strokeRect(15, 38, 290, 42);
+        ctx.fillStyle = '#fff1f2';
+        ctx.fillRect(16, 36, 288, 40);
+        ctx.strokeStyle = '#e11d48';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(16, 36, 288, 40);
 
         for (let b = 0; b < 16; b++) {
-          ctx.fillStyle = b % 7 === 0 ? '#3b82f6' : '#ef4444';
-          const bx = 22 + ((b * 20 + Date.now() * 0.06) % 276);
-          const by = 52 + (b % 2) * 14;
-          ctx.beginPath(); ctx.arc(bx, by, 5.5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = b % 7 === 0 ? '#2563eb' : '#dc2626';
+          const bx = 24 + ((b * 20 + Date.now() * 0.06) % 272);
+          const by = 49 + (b % 2) * 14;
+          ctx.beginPath(); ctx.arc(bx, by, 4.8, 0, Math.PI * 2); ctx.fill();
         }
-        ctx.fillStyle = '#34d399';
-        ctx.font = 'bold 10px JetBrains Mono, monospace';
-        ctx.fillText(`Oxy-Hb Rush (+${task.boldPct}%) → Strong fMRI Signal Glow!`, 18, 20);
-      }
-    }
-
-    // ==================== MAIN 2D NEUROIMAGING SUITE RENDERER ====================
-    function renderScannerSuite() {
-      const task = PARADIGMS[suiteState.paradigmKey];
-      stepCapillaryBoldPhysics();
-      drawBoldScopeOnCanvas(document.getElementById('bold-scope-inline'));
-      renderBgCutawayCanvas(task);
-
-      const canvas = document.getElementById('fmri-bench-canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Left Room: MRI Scanner Room (x: 0 to 770, y: 0 to 345)
-      const magWallGrad = ctx.createLinearGradient(0, 0, 0, 345);
-      magWallGrad.addColorStop(0, '#f1f5f9');
-      magWallGrad.addColorStop(1, '#cbd5e1');
-      ctx.fillStyle = magWallGrad;
-      ctx.fillRect(0, 0, 770, 345);
-
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < 770; x += 45) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 345); ctx.stroke();
-      }
-      for (let y = 0; y < 345; y += 45) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(770, y); ctx.stroke();
-      }
-
-      // Floor (y: 345 to 450)
-      const floorGrad = ctx.createLinearGradient(0, 345, 0, 450);
-      floorGrad.addColorStop(0, '#94a3b8');
-      floorGrad.addColorStop(1, '#475569');
-      ctx.fillStyle = floorGrad;
-      ctx.fillRect(0, 345, 770, 105);
-
-      // 5-Gauss Safety Line
-      ctx.strokeStyle = '#eab308';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([12, 8]);
-      ctx.beginPath(); ctx.moveTo(35, 395); ctx.lineTo(745, 395); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#fef08a';
-      ctx.font = 'bold 10px JetBrains Mono, monospace';
-      ctx.fillText('⚠ 3.0 TESLA MAGNETIC SAFETY LINE', 265, 415);
-
-      // 3.0T MRI Scanner Gantry
-      const gx = 210, gy = 175;
-      ctx.fillStyle = '#f8fafc';
-      ctx.strokeStyle = '#64748b';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(65, 15, 290, 330, 45);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.strokeStyle = '#0ea5e9';
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.arc(gx, gy, 112, 0, Math.PI * 2);
-      ctx.stroke();
-
-      const boreGrad = ctx.createRadialGradient(gx, gy, 15, gx, gy, 90);
-      boreGrad.addColorStop(0, '#020617');
-      boreGrad.addColorStop(1, '#1e293b');
-      ctx.fillStyle = boreGrad;
-      ctx.beginPath();
-      ctx.arc(gx, gy, 88, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (suiteState.scanRunning) {
-        const pulseR = 35 + ((Date.now() * 0.06) % 50);
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(gx, gy, pulseR, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Scanner Button Panel
-      ctx.fillStyle = '#1e293b';
-      ctx.beginPath();
-      ctx.roundRect(285, 85, 52, 65, 6);
-      ctx.fill();
-      ctx.fillStyle = suiteState.bedOffsetX < 0 ? '#10b981' : '#22c55e';
-      ctx.beginPath();
-      ctx.arc(311, 108, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 8px JetBrains Mono, monospace';
-      ctx.fillText('MOVE BED', 290, 138);
-
-      ctx.fillStyle = '#334155';
-      ctx.font = 'bold 12px Inter, sans-serif';
-      ctx.fillText('3.0T fMRI SCANNER', 152, 42);
-
-      // Patient Bed Pedestal
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(455, 235, 165, 110);
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(435, 332, 205, 14);
-
-      const cradleX = 395 + suiteState.bedOffsetX;
-      const cradleY = 215;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(165, 0, 605, 450);
-      ctx.clip();
-
-      ctx.fillStyle = '#e2e8f0';
-      ctx.strokeStyle = '#64748b';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(cradleX, cradleY, 275, 22, 6);
-      ctx.fill();
-      ctx.stroke();
-
-      if (suiteState.subjectOnBed) {
-        ctx.fillStyle = '#fcd34d';
-        ctx.beginPath();
-        ctx.arc(cradleX + 36, cradleY - 16, 16, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#f97316';
-        ctx.beginPath();
-        ctx.arc(cradleX + 36, cradleY - 16, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#0284c7';
-        ctx.beginPath();
-        ctx.roundRect(cradleX + 54, cradleY - 26, 95, 26, 8);
-        ctx.fill();
-
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        ctx.roundRect(cradleX + 149, cradleY - 20, 95, 20, 6);
-        ctx.fill();
-      } else {
-        ctx.strokeStyle = '#94a3b8';
-        ctx.setLineDash([5, 4]);
-        ctx.strokeRect(cradleX + 20, cradleY - 28, 220, 26);
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#64748b';
+        ctx.fillStyle = '#059669';
         ctx.font = 'bold 10px Inter, sans-serif';
-        ctx.fillText('Tap Here to Place Volunteer on Bed', cradleX + 42, cradleY - 11);
+        ctx.fillText(`Fresh Oxy-Hb Rush (+${task.boldPct}%) → MRI Signal Boost`, W / 2, 14);
       }
-
-      // Head Helmet (RF Coil)
-      const coilX = cradleX + 14;
-      const coilY = suiteState.coilY;
-      ctx.fillStyle = 'rgba(248, 250, 252, 0.9)';
-      ctx.strokeStyle = '#0284c7';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.roundRect(coilX, coilY, 46, 42, 8);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(coilX + 8, coilY + 6, 8, 30);
-      ctx.fillRect(coilX + 20, coilY + 6, 8, 30);
-      ctx.fillRect(coilX + 32, coilY + 6, 8, 30);
 
       ctx.restore();
+    }
 
-      // Task Projector
-      ctx.fillStyle = '#1e293b';
-      ctx.strokeStyle = '#64748b';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(655, 52, 85, 42, 6);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#334155';
-      ctx.font = 'bold 10px Inter, sans-serif';
-      ctx.fillText('4. Projector', 665, 44);
+    // ==================== PROGRESSIVE 2D MRI DIAGRAM RENDERER (ONLY DRAWS RELEVANT APPARATUS!) ====================
+    function renderScannerSuite() {
+      if (suiteState.taskSelected) {
+        const task = PARADIGMS[suiteState.paradigmKey];
+        stepCapillaryBoldPhysics();
+        renderBgCutawayCanvas(task);
 
-      if (suiteState.stimulusActive) {
-        const beamGrad = ctx.createLinearGradient(655, 72, 240, 165);
-        beamGrad.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
-        beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0.02)');
-        ctx.fillStyle = beamGrad;
+        if (suiteState.step >= 4) {
+          drawBoldScopeOnCanvas(document.getElementById('bold-scope-inline'));
+        }
+        if (suiteState.scanCompleted) {
+          renderStage3BrainMap(task);
+        }
+
+        const canvas = document.getElementById('fmri-bench-canvas');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        // Pure White Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
+
+        // Clean Floor Baseline
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(655, 65);
-        ctx.lineTo(235, 140);
-        ctx.lineTo(235, 195);
-        ctx.lineTo(655, 82);
-        ctx.closePath();
-        ctx.fill();
-
-        const isTaskBlock = Math.floor(Date.now() / 1200) % 2 === 0;
-        ctx.fillStyle = isTaskBlock ? '#10b981' : '#f59e0b';
-        ctx.fillRect(663, 62, 68, 22);
-        ctx.fillStyle = '#020617';
-        ctx.font = 'bold 9px JetBrains Mono, monospace';
-        ctx.fillText(isTaskBlock ? 'ACTIVITY ON' : 'REST BLOCK', 667, 76);
-      } else {
-        ctx.fillStyle = '#475569';
-        ctx.fillRect(663, 62, 68, 22);
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '9px JetBrains Mono, monospace';
-        ctx.fillText('OFF', 688, 76);
-      }
-
-      // ==================== RIGHT ROOM: CONTROL ROOM & COMPUTERS ====================
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(766, 0, 12, 450);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(778, 0, 372, 450);
-
-      // Top Observation Window
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
-      ctx.strokeStyle = '#475569';
-      ctx.lineWidth = 3;
-      ctx.fillRect(805, 20, 315, 105);
-      ctx.strokeRect(805, 20, 315, 105);
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 11px Inter, sans-serif';
-      ctx.fillText(`Activity: ${task.name}`, 818, 42);
-      ctx.fillStyle = '#fde047';
-      ctx.font = '10px Inter, sans-serif';
-      ctx.fillText(`Active Brain Region: ${task.mainArea}`, 818, 62);
-
-      // Simple Rest vs Activity Wave Diagram
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      for (let bx = 0; bx < 280; bx += 2) {
-        const blockHigh = Math.floor(bx / 45) % 2 === 1;
-        const by = blockHigh ? 82 : 108;
-        if (bx === 0) ctx.moveTo(820 + bx, by);
-        else ctx.lineTo(820 + bx, by);
-      }
-      ctx.stroke();
-
-      // Desk
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(778, 280, 372, 22);
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(778, 302, 372, 148);
-
-      // Left Computer Screen: Oxygen Signal (BOLD) Scanner
-      const m1x = 820, m1y = 145, mw = 130, mh = 105;
-      ctx.fillStyle = '#020617';
-      ctx.strokeStyle = suiteState.step === 5 ? '#38bdf8' : '#64748b';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.roundRect(m1x, m1y, mw, mh, 6);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(m1x + 52, m1y + mh, 26, 30);
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 9px Inter, sans-serif';
-      ctx.fillText('5. OXYGEN (BOLD) SCAN', m1x + 8, m1y + 15);
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '8px JetBrains Mono, monospace';
-      ctx.fillText(`Scan Progress: ${suiteState.scanProgress}%`, m1x + 8, m1y + 28);
-
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(m1x + 8, m1y + 34, mw - 16, 7);
-      ctx.fillStyle = '#10b981';
-      ctx.fillRect(m1x + 8, m1y + 34, ((mw - 16) * suiteState.scanProgress) / 100, 7);
-
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      for (let i = 0; i < 110; i += 2) {
-        const px = m1x + 8 + i;
-        const val = suiteState.boldWaveHistory[Math.min(194, Math.floor(i * 1.7))] || 18;
-        const py = m1y + 92 - (suiteState.scanProgress > 0 ? Math.min(42, val * 0.32) : 4);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-
-      // Right Computer Screen: Glowing Brain Map
-      const m2x = 970, m2y = 145;
-      ctx.fillStyle = '#020617';
-      ctx.strokeStyle = suiteState.step === 6 ? '#f43f5e' : '#64748b';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.roundRect(m2x, m2y, mw, mh, 6);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(m2x + 52, m2y + mh, 26, 30);
-
-      ctx.fillStyle = '#fda4af';
-      ctx.font = 'bold 9px Inter, sans-serif';
-      ctx.fillText('6. GLOWING BRAIN MAP', m2x + 8, m2y + 15);
-
-      ctx.fillStyle = '#334155';
-      ctx.beginPath();
-      ctx.ellipse(m2x + 65, m2y + 62, 28, 34, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (suiteState.scanCompleted) {
-        task.clusters.forEach(c => {
-          const cx = m2x + 65 + (c.axX - 160) * 0.38;
-          const cy = m2y + 62 + (c.axY - 160) * 0.38;
-          const grad = ctx.createRadialGradient(cx, cy, 1, cx, cy, 11);
-          grad.addColorStop(0, '#fef08a');
-          grad.addColorStop(0.5, '#ef4444');
-          grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.arc(cx, cy, 11, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
-      // Guided Bouncing Red Pointer
-      if (!suiteState.animBusy && STEP_INSTRUCTIONS[suiteState.step]) {
-        const ptr = STEP_INSTRUCTIONS[suiteState.step].pointer;
-        const bounceOffset = Math.sin(Date.now() * 0.006) * 6;
-        const px = ptr.x, py = ptr.y + bounceOffset;
-
-        ctx.fillStyle = '#a4123f';
-        ctx.beginPath();
-        ctx.roundRect(px - 78, py - 34, 156, 24, 6);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.5;
+        ctx.moveTo(30, 305);
+        ctx.lineTo(W - 30, 305);
         ctx.stroke();
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(ptr.label, px, py - 18);
+        // ==================== ALWAYS RELEVANT IN STAGE 1: 3.0T MRI GANTRY & PATIENT TABLE ====================
+        const gx = 235, gy = 165;
 
-        ctx.fillStyle = '#e11d48';
+        // Outer Gantry Housing
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.moveTo(px - 10, py - 10);
-        ctx.lineTo(px + 10, py - 10);
-        ctx.lineTo(px, py + 4);
-        ctx.closePath();
+        ctx.roundRect(90, 22, 290, 283, 48);
         ctx.fill();
-        ctx.textAlign = 'left';
-      }
+        ctx.stroke();
 
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(120, 297, 230, 8);
+
+        // Bore Ring
+        ctx.fillStyle = '#f1f5f9';
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(gx, gy, 102, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Inner Bore Tunnel
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(gx, gy, 78, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Red Laser Crosshair
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(gx - 25, gy); ctx.lineTo(gx + 25, gy);
+        ctx.moveTo(gx, gy - 25); ctx.lineTo(gx, gy + 25);
+        ctx.stroke();
+
+        if (suiteState.scanRunning) {
+          const pulseR = 25 + ((Date.now() * 0.06) % 48);
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.arc(gx, gy, pulseR, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Top Gantry Badge
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.roundRect(165, 32, 140, 20, 4);
+        ctx.fill();
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 9.5px JetBrains Mono, monospace';
+        ctx.fillText('MAGNETOM 3.0T', 235, 42);
+        ctx.restore();
+
+        // Gantry Control Button (Only highlighted / shown prominently from Step 3 onwards)
+        if (suiteState.step >= 3) {
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.roundRect(318, 84, 52, 58, 6);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = suiteState.bedOffsetX < 0 ? '#16a34a' : '#0284c7';
+          ctx.beginPath();
+          ctx.arc(344, 105, 10, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#1e293b';
+          ctx.font = 'bold 8px Inter, sans-serif';
+          ctx.fillText('MOVE BED', 344, 128);
+          ctx.restore();
+        }
+
+        // Patient Table Support Pedestal
+        ctx.fillStyle = '#f8fafc';
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(480, 205, 165, 100, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#475569';
+        ctx.fillRect(460, 297, 205, 8);
+
+        const cradleX = 420 + suiteState.bedOffsetX;
+        const cradleY = 190;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(190, 20, 620, 285);
+        ctx.clip();
+
+        // Sliding Bed
+        ctx.fillStyle = '#e2e8f0';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(cradleX, cradleY, 275, 16, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        if (suiteState.subjectOnBed) {
+          ctx.fillStyle = '#fcd34d';
+          ctx.strokeStyle = '#b45309';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(cradleX + 36, cradleY - 15, 14, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#334155';
+          ctx.beginPath();
+          ctx.arc(cradleX + 36, cradleY - 15, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#0284c7';
+          ctx.beginPath();
+          ctx.roundRect(cradleX + 52, cradleY - 24, 95, 24, 6);
+          ctx.fill();
+
+          ctx.fillStyle = '#334155';
+          ctx.beginPath();
+          ctx.roundRect(cradleX + 147, cradleY - 18, 98, 18, 4);
+          ctx.fill();
+        } else {
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([5, 4]);
+          ctx.strokeRect(cradleX + 20, cradleY - 30, 230, 28);
+          ctx.setLineDash([]);
+
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#475569';
+          ctx.font = 'bold 10.5px Inter, sans-serif';
+          ctx.fillText('Click Here to Position Patient on Table', cradleX + 135, cradleY - 16);
+        }
+
+        // RF Head Coil (Only shown from Step 2 onwards!)
+        if (suiteState.step >= 2) {
+          const coilX = cradleX + 14;
+          const coilY = suiteState.coilY;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+          ctx.strokeStyle = '#0284c7';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(coilX, coilY, 46, 42, 6);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(coilX + 8, coilY + 6, 7, 30);
+          ctx.fillRect(coilX + 20, coilY + 6, 7, 30);
+          ctx.fillRect(coilX + 32, coilY + 6, 7, 30);
+        }
+        ctx.restore();
+
+        // ==================== PROGRESSIVELY REVEALED IN STEP 4: TASK STIMULUS PROJECTOR ====================
+        if (suiteState.step >= 4) {
+          ctx.fillStyle = '#f8fafc';
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(670, 52, 90, 42, 5);
+          ctx.fill();
+          ctx.stroke();
+
+          if (suiteState.stimulusActive) {
+            const beamGrad = ctx.createLinearGradient(670, 72, 260, 165);
+            beamGrad.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
+            beamGrad.addColorStop(1, 'rgba(2, 132, 199, 0.01)');
+            ctx.fillStyle = beamGrad;
+            ctx.beginPath();
+            ctx.moveTo(670, 64);
+            ctx.lineTo(260, 135);
+            ctx.lineTo(260, 185);
+            ctx.lineTo(670, 82);
+            ctx.closePath();
+            ctx.fill();
+
+            const isTaskBlock = Math.floor(Date.now() / 1200) % 2 === 0;
+            ctx.fillStyle = isTaskBlock ? '#16a34a' : '#d97706';
+            ctx.fillRect(678, 60, 74, 26);
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 9px JetBrains Mono, monospace';
+            ctx.fillText(isTaskBlock ? 'TASK ON' : 'REST OFF', 715, 73);
+            ctx.restore();
+          } else {
+            ctx.fillStyle = '#e2e8f0';
+            ctx.fillRect(678, 60, 74, 26);
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 9px JetBrains Mono, monospace';
+            ctx.fillText('START TASK', 715, 73);
+            ctx.restore();
+          }
+
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#334155';
+          ctx.font = 'bold 10.5px Inter, sans-serif';
+          ctx.fillText('4. Stimulus Projector', 715, 110);
+          ctx.restore();
+        }
+
+        // ==================== PROGRESSIVELY REVEALED IN STEP 5: BOLD SCAN ACQUISITION MONITOR ====================
+        if (suiteState.step >= 5) {
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(800, 20);
+          ctx.lineTo(800, 340);
+          ctx.stroke();
+
+          // Desk & Monitor
+          ctx.fillStyle = '#e2e8f0';
+          ctx.strokeStyle = '#94a3b8';
+          ctx.fillRect(830, 250, 210, 10);
+          ctx.strokeRect(830, 250, 210, 10);
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillRect(850, 260, 10, 45);
+          ctx.fillRect(1010, 260, 10, 45);
+
+          const m1x = 850, m1y = 122, mw = 150, mh = 105;
+          ctx.fillStyle = '#64748b';
+          ctx.fillRect(m1x + 62, m1y + mh, 26, 23);
+
+          ctx.fillStyle = '#0f172a';
+          ctx.strokeStyle = suiteState.step === 5 ? '#a4123f' : '#16a34a';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.roundRect(m1x, m1y, mw, mh, 5);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 9.5px JetBrains Mono, monospace';
+          ctx.fillText('5. BOLD SIGNAL SCAN', m1x + mw / 2, m1y + 15);
+          ctx.fillStyle = '#cbd5e1';
+          ctx.font = '8.5px JetBrains Mono, monospace';
+          ctx.fillText(`Progress: ${suiteState.scanProgress}%`, m1x + mw / 2, m1y + 30);
+          ctx.restore();
+
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(m1x + 12, m1y + 38, mw - 24, 6);
+          ctx.fillStyle = '#10b981';
+          ctx.fillRect(m1x + 12, m1y + 38, ((mw - 24) * suiteState.scanProgress) / 100, 6);
+
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          for (let i = 0; i < 124; i += 2) {
+            const px = m1x + 12 + i;
+            const val = suiteState.boldWaveHistory[Math.min(194, Math.floor(i * 1.5))] || 18;
+            const py = m1y + 92 - (suiteState.scanProgress > 0 ? Math.min(40, val * 0.32) : 4);
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#334155';
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.fillText('5. Acquisition Console', 925, 328);
+          ctx.restore();
+        }
+
+        // Bottom Labels for Active Apparatus Only
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#334155';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText('3.0T MRI Magnet Bore', 235, 328);
+        ctx.fillText(suiteState.step >= 2 ? '1. Patient Table & 2. RF Head Coil' : '1. MRI Patient Table', 560, 328);
+        ctx.restore();
+
+        // Guided Bouncing Red Pointer
+        if (!suiteState.animBusy && STEP_INSTRUCTIONS[suiteState.step] && STEP_INSTRUCTIONS[suiteState.step].pointer) {
+          const ptr = STEP_INSTRUCTIONS[suiteState.step].pointer;
+          const bounceOffset = Math.sin(Date.now() * 0.006) * 5;
+          const px = ptr.x, py = ptr.y + bounceOffset;
+
+          ctx.fillStyle = '#a4123f';
+          ctx.beginPath();
+          ctx.roundRect(px - 82, py - 34, 164, 24, 5);
+          ctx.fill();
+
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 10px Inter, sans-serif';
+          ctx.fillText(ptr.label, px, py - 22);
+          ctx.restore();
+
+          ctx.fillStyle = '#a4123f';
+          ctx.beginPath();
+          ctx.moveTo(px - 8, py - 10);
+          ctx.lineTo(px + 8, py - 10);
+          ctx.lineTo(px, py + 2);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
       requestAnimationFrame(renderScannerSuite);
     }
 
-    // ==================== INTERACTIVE BENCH CLICK & TOUCH HANDLERS ====================
+    // ==================== DYNAMIC HITBOXES FOR CURRENT STEP ====================
     const benchCanvas = document.getElementById('fmri-bench-canvas');
-    const tooltip = document.getElementById('apparatus-tooltip');
+    function getActiveHitboxes() {
+      const boxes = [
+        { id: 'patientBed', x: 410, y: 145, w: 280, h: 160, name: "MRI Patient Table" }
+      ];
+      if (suiteState.step >= 2) {
+        boxes.push({ id: 'rfCoil', x: 405, y: 75, w: 90, h: 120, name: "64-Channel RF Head Coil" });
+      }
+      if (suiteState.step >= 3) {
+        boxes.push({ id: 'gantryBtn', x: 305, y: 75, w: 75, h: 80, name: "Gantry Move Bed Button" });
+      }
+      if (suiteState.step >= 4) {
+        boxes.push({ id: 'projector', x: 660, y: 40, w: 110, h: 75, name: "Task Stimulus Projector" });
+      }
+      if (suiteState.step >= 5) {
+        boxes.push({ id: 'epiMonitor', x: 840, y: 115, w: 170, h: 135, name: "BOLD Scan Acquisition Monitor" });
+      }
+      return boxes;
+    }
 
     function getCanvasMouse(e) {
       const rect = benchCanvas.getBoundingClientRect();
@@ -1376,43 +1374,16 @@
       const clientY = e.touches && e.touches.length ? e.touches[0].clientY : e.clientY;
       return {
         x: ((clientX - rect.left) / benchCanvas.clientWidth) * benchCanvas.width,
-        y: ((clientY - rect.top) / benchCanvas.clientHeight) * benchCanvas.height,
-        rawX: clientX - rect.left,
-        rawY: clientY - rect.top
+        y: ((clientY - rect.top) / benchCanvas.clientHeight) * benchCanvas.height
       };
     }
 
-    benchCanvas.addEventListener('mousemove', (e) => {
-      const m = getCanvasMouse(e);
-      let hit = null;
-      for (const box of HITBOXES) {
-        if (m.x >= box.x && m.x <= box.x + box.w && m.y >= box.y && m.y <= box.y + box.h) {
-          hit = box;
-          break;
-        }
-      }
-
-      if (hit) {
-        benchCanvas.style.cursor = 'pointer';
-        tooltip.classList.remove('hidden');
-        tooltip.style.left = `${Math.min(benchCanvas.clientWidth - 220, m.rawX + 14)}px`;
-        tooltip.style.top = `${Math.max(10, m.rawY - 32)}px`;
-        tooltip.textContent = hit.name;
-      } else {
-        benchCanvas.style.cursor = 'default';
-        tooltip.classList.add('hidden');
-      }
-    });
-
-    benchCanvas.addEventListener('mouseleave', () => {
-      tooltip.classList.add('hidden');
-    });
-
     function onBenchTapOrClick(e) {
-      if (suiteState.animBusy) return;
+      if (!suiteState.taskSelected || suiteState.animBusy) return;
       const m = getCanvasMouse(e);
-      const pad = e.touches ? 18 : 6;
-      for (const box of HITBOXES) {
+      const pad = e.touches ? 18 : 8;
+      const activeBoxes = getActiveHitboxes();
+      for (const box of activeBoxes) {
         if (
           m.x >= box.x - pad &&
           m.x <= box.x + box.w + pad &&
@@ -1430,21 +1401,12 @@
       onBenchTapOrClick(e);
     }, { passive: true });
 
-    // ==================== DELIBERATE, REALISTIC-PACED 6-STEP ANIMATIONS ====================
+    // ==================== SEQUENTIAL STEP EXECUTION & PROGRESSIVE SECTION REVEAL ====================
     function handleApparatusClick(apparatusId) {
-      if (apparatusId === 'glmMonitor' && (suiteState.scanCompleted || suiteState.step === 6)) {
-        openOcularModal('brainmap');
-        return;
-      }
-      if (apparatusId === 'epiMonitor' && suiteState.scanCompleted) {
-        openOcularModal('boldscope');
-        return;
-      }
-
       const livePill = document.getElementById('bg-process-live-pill');
       const quickBtn = document.getElementById('quick-step-btn');
 
-      // STEP 1: Place Volunteer Supine on MRI Table (~2.5 seconds)
+      // STEP 1: Position Patient Supine -> Unlocks Step 2 (RF Head Coil)
       if (suiteState.step === 1 && apparatusId === 'patientBed') {
         suiteState.animBusy = true;
         quickBtn.disabled = true;
@@ -1453,11 +1415,11 @@
         let ticks = 0;
         const timer = setInterval(() => {
           ticks++;
-          setBgProgress(ticks / 45);
-          livePill.textContent = "Positioning Volunteer...";
-          if (ticks >= 45) {
+          setBgProgress(ticks / 40);
+          livePill.textContent = "Positioning Patient...";
+          if (ticks >= 40) {
             setBgProgress(1.0);
-            livePill.textContent = "Volunteer Supine";
+            livePill.textContent = "Patient Supine";
             clearInterval(timer);
             suiteState.animBusy = false;
             quickBtn.disabled = false;
@@ -1468,21 +1430,21 @@
         }, 35);
       }
 
-      // STEP 2: Slowly Slide 64-Channel RF Head Helmet Over Volunteer's Head (~4.5 seconds)
+      // STEP 2: Lock RF Head Coil -> Unlocks Step 3 (Gantry Button)
       else if (suiteState.step === 2 && (apparatusId === 'rfCoil' || apparatusId === 'patientBed')) {
         suiteState.animBusy = true;
         quickBtn.disabled = true;
         quickBtn.classList.add('opacity-50');
         setBgProgress(0);
         const timer = setInterval(() => {
-          suiteState.coilY += 0.65;
-          setBgProgress((suiteState.coilY - 105) / (172 - 105));
-          livePill.textContent = "Lowering RF Helmet...";
-          if (suiteState.coilY >= 172) {
-            suiteState.coilY = 172;
+          suiteState.coilY += 0.7;
+          setBgProgress((suiteState.coilY - 88) / (148 - 88));
+          livePill.textContent = "Lowering RF Coil...";
+          if (suiteState.coilY >= 148) {
+            suiteState.coilY = 148;
             suiteState.coilLocked = true;
             setBgProgress(1.0);
-            livePill.textContent = "Helmet Locked";
+            livePill.textContent = "RF Coil Locked";
             clearInterval(timer);
             suiteState.animBusy = false;
             quickBtn.disabled = false;
@@ -1493,16 +1455,16 @@
         }, 35);
       }
 
-      // STEP 3: Slowly Glide Motorized Bed into 3.0T Magnet Isocenter (~6 seconds)
+      // STEP 3: Move Patient Into 3.0T Bore -> Unlocks Step 4 (Projector)
       else if (suiteState.step === 3 && apparatusId === 'gantryBtn') {
         suiteState.animBusy = true;
         quickBtn.disabled = true;
         quickBtn.classList.add('opacity-50');
         setBgProgress(0);
         const timer = setInterval(() => {
-          suiteState.bedOffsetX -= 1.25;
+          suiteState.bedOffsetX -= 1.4;
           setBgProgress(Math.abs(suiteState.bedOffsetX) / 185);
-          livePill.textContent = "Gliding into 3.0T Bore...";
+          livePill.textContent = "Advancing Table...";
           if (suiteState.bedOffsetX <= -185) {
             suiteState.bedOffsetX = -185;
             setBgProgress(1.0);
@@ -1517,22 +1479,25 @@
         }, 35);
       }
 
-      // STEP 4: Launch In-Bore Task Projector & Trigger Neural Firing (~3.5 seconds)
+      // STEP 4: Start Task Stimulus -> Reveals Stage 2 (Live Capillary BOLD Scope) & Unlocks Step 5
       else if (suiteState.step === 4 && apparatusId === 'projector') {
         suiteState.animBusy = true;
         quickBtn.disabled = true;
         quickBtn.classList.add('opacity-50');
         suiteState.stimulusActive = true;
         suiteState.hyperemiaActive = true;
-        updateBoldScopeUI();
+
+        // Reveal Stage 2 Live BOLD Scope!
+        document.getElementById('stage-2-boldscope').classList.remove('hidden');
+
         let ticks = 0;
         const timer = setInterval(() => {
           ticks++;
-          setBgProgress(ticks / 65);
-          livePill.textContent = "Neurons Firing...";
-          if (ticks >= 65) {
+          setBgProgress(ticks / 55);
+          livePill.textContent = "Stimulus Active...";
+          if (ticks >= 55) {
             setBgProgress(1.0);
-            livePill.textContent = "Activity Running";
+            livePill.textContent = "Task Running";
             clearInterval(timer);
             suiteState.animBusy = false;
             quickBtn.disabled = false;
@@ -1543,92 +1508,64 @@
         }, 35);
       }
 
-      // STEP 5: Deliberate fMRI Oxygen (BOLD) Scan Acquisition (~8 seconds)
-      else if (suiteState.step === 5 && (apparatusId === 'epiMonitor' || apparatusId === 'glmMonitor')) {
+      // STEP 5: Acquire fMRI Scan -> Reveals Stage 3 (Brain Activation Map & Worksheet)
+      else if (suiteState.step === 5 && apparatusId === 'epiMonitor') {
         suiteState.animBusy = true;
         quickBtn.disabled = true;
         quickBtn.classList.add('opacity-50');
         suiteState.scanRunning = true;
         suiteState.hyperemiaActive = true;
-        updateBoldScopeUI();
         suiteState.scanProgress = 0;
         setBgProgress(0);
-        document.getElementById('scan-status-badge').textContent = "Scanning Brain Oxygen...";
-        document.getElementById('scan-status-badge').className = "text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300";
 
         const timer = setInterval(() => {
-          suiteState.scanProgress += 1;
+          suiteState.scanProgress += 2;
           setBgProgress(suiteState.scanProgress / 100);
-
-          if (suiteState.scanProgress < 35) {
-            livePill.textContent = `Capillary Dilation (${suiteState.scanProgress}%)...`;
-          } else if (suiteState.scanProgress < 75) {
-            livePill.textContent = `Oxy-Hb Rush (${suiteState.scanProgress}%)...`;
-          } else {
-            livePill.textContent = `Mapping Active Lobe (${suiteState.scanProgress}%)...`;
-          }
+          livePill.textContent = `Scanning BOLD (${suiteState.scanProgress}%)...`;
 
           if (suiteState.scanProgress >= 100) {
             suiteState.scanProgress = 100;
             suiteState.scanRunning = false;
             suiteState.scanCompleted = true;
-            livePill.textContent = "Brain Map Ready";
+            livePill.textContent = "Scan Complete";
             clearInterval(timer);
             suiteState.animBusy = false;
-            quickBtn.disabled = false;
-            quickBtn.classList.remove('opacity-50');
             suiteState.step = 6;
-            const task = PARADIGMS[suiteState.paradigmKey];
-            document.getElementById('scan-status-badge').textContent = `Active: ${task.mainArea}`;
-            document.getElementById('scan-status-badge').className = "text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-rose-100 text-[#a4123f] border border-rose-300";
             updateBannerUI();
-            autoLogCompletedScan();
+
+            // Reveal Stage 3 Results (Brain Activation Map, Filter & Worksheet)!
+            revealStage3Results();
           }
-        }, 75);
+        }, 65);
       }
     }
 
-    // ==================== MOBILE-RESPONSIVE OCULAR / BRAIN MAP MODAL ====================
-    function openOcularModal(mode) {
-      suiteState.activeModalMode = mode;
-      document.getElementById('ocular-modal').classList.remove('hidden');
+    // ==================== STAGE 3: BRAIN ACTIVATION MAP & WORKSHEET ====================
+    function revealStage3Results() {
+      const task = PARADIGMS[suiteState.paradigmKey];
+      const stage3 = document.getElementById('stage-3-results');
+      stage3.classList.remove('hidden');
 
-      const bmToolbar = document.getElementById('brainmap-toolbar');
-      const bsToolbar = document.getElementById('boldscope-toolbar');
-      const filterPanel = document.getElementById('noise-filter-panel');
-      const tappedBanner = document.getElementById('tapped-spot-banner');
+      document.getElementById('results-header-title').textContent = 
+        `Brain Activation Map — ${task.name}`;
 
-      if (mode === 'brainmap') {
-        bmToolbar.classList.remove('hidden');
-        bsToolbar.classList.add('hidden');
-        filterPanel.classList.remove('hidden');
-        tappedBanner.classList.remove('hidden');
-      } else if (mode === 'boldscope') {
-        bmToolbar.classList.add('hidden');
-        bsToolbar.classList.remove('hidden');
-        filterPanel.classList.add('hidden');
-        tappedBanner.classList.add('hidden');
-      } else {
-        bmToolbar.classList.add('hidden');
-        bsToolbar.classList.add('hidden');
-        filterPanel.classList.add('hidden');
-        tappedBanner.classList.add('hidden');
-      }
       updateModalDetails();
-    }
+      renderWorksheetTable();
+      autoLogCompletedScan();
 
-    function closeOcularModal() {
-      document.getElementById('ocular-modal').classList.add('hidden');
+      setTimeout(() => {
+        stage3.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
 
     function setSlicePlane(plane) {
       suiteState.slicePlane = plane;
-      ['axial', 'sagittal'].forEach(p => {
+      ['axial', 'sagittal', 'hrf'].forEach(p => {
         const btn = document.getElementById(`plane-${p}`);
         if (p === plane) {
-          btn.className = "px-2.5 py-1 rounded bg-[#a4123f] text-white font-semibold cursor-pointer";
+          btn.className = "px-3 py-1.5 rounded bg-[#a4123f] text-white text-xs font-semibold cursor-pointer";
         } else {
-          btn.className = "px-2.5 py-1 rounded bg-slate-800 text-slate-300 font-semibold cursor-pointer";
+          btn.className = "px-3 py-1.5 rounded bg-white text-slate-700 border border-slate-300 text-xs font-semibold cursor-pointer";
         }
       });
     }
@@ -1640,15 +1577,15 @@
       if (suiteState.noiseFilterLevel === 1) {
         label.textContent = "Low Filter (Noisy)";
         label.className = "mono text-amber-600 font-bold";
-        helper.innerHTML = "<strong>Low Filter:</strong> Shows random background brain chatter (extra red dots) along with the main active area.";
+        helper.innerHTML = "<strong>Low Filter:</strong> Shows random background brain chatter alongside the main active region.";
       } else if (suiteState.noiseFilterLevel === 2) {
         label.textContent = "Medium (Clean Map)";
         label.className = "mono text-emerald-700 font-bold";
-        helper.innerHTML = "<strong>Medium Filter (Best):</strong> Hides random background noise so all true working brain areas stand out clearly.";
+        helper.innerHTML = "<strong>Medium Filter:</strong> Removes random background brain noise so only the active regions stand out clearly.";
       } else {
         label.textContent = "High Filter (Strict)";
         label.className = "mono text-[#a4123f] font-bold";
-        helper.innerHTML = "<strong>High Filter:</strong> Only shows the #1 strongest glowing spot in the brain.";
+        helper.innerHTML = "<strong>High Filter:</strong> Isolates only the single strongest peak region.";
       }
     }
 
@@ -1658,13 +1595,12 @@
       document.getElementById('modal-region-header').textContent = `${cluster.roi} (${cluster.location})`;
       document.getElementById('modal-region-text').textContent = `${cluster.role} ${task.simpleTakeaway}`;
       document.getElementById('modal-bold-val').textContent = cluster.bold;
-      document.getElementById('tapped-spot-banner').innerHTML = `<strong class="text-amber-300">Selected:</strong> ${cluster.roi} (${cluster.location})`;
+      document.getElementById('tapped-spot-banner').innerHTML = `<strong class="text-[#a4123f]">Selected:</strong> ${cluster.roi} (${cluster.bold})`;
     }
 
-    // Touch & Click Handler for 320x320 Modal Canvas
     const ocularCanvas = document.getElementById('ocular-canvas');
     function handleModalTap(e) {
-      if (suiteState.activeModalMode !== 'brainmap') return;
+      if (!suiteState.scanCompleted || suiteState.slicePlane === 'hrf') return;
       const rect = ocularCanvas.getBoundingClientRect();
       const clientX = e.touches && e.touches.length ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches && e.touches.length ? e.touches[0].clientY : e.clientY;
@@ -1687,146 +1623,152 @@
       handleModalTap(e);
     }, { passive: false });
 
-    function animateOcularCanvas() {
-      const modal = document.getElementById('ocular-modal');
-      if (!modal.classList.contains('hidden')) {
-        const canvas = document.getElementById('ocular-canvas');
-        const ctx = canvas.getContext('2d');
-        const task = PARADIGMS[suiteState.paradigmKey];
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function renderStage3BrainMap(task) {
+      const canvas = document.getElementById('ocular-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
 
-        ctx.fillStyle = '#020617';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
 
-        if (suiteState.activeModalMode === 'brainmap') {
-          ctx.fillStyle = '#94a3b8';
-          ctx.font = 'bold 10px Inter, sans-serif';
-          if (suiteState.slicePlane === 'axial') {
-            ctx.fillText('FRONT (Forehead)', 116, 26);
-            ctx.fillText('BACK (Visual Lobe)', 112, 304);
-            ctx.fillText('LEFT', 22, 165);
-            ctx.fillText('RIGHT', 262, 165);
+      if (suiteState.slicePlane === 'axial' || suiteState.slicePlane === 'sagittal') {
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#475569';
+        ctx.font = 'bold 10px Inter, sans-serif';
 
-            ctx.fillStyle = '#334155';
-            ctx.strokeStyle = '#64748b';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.ellipse(160, 165, 82, 108, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+        if (suiteState.slicePlane === 'axial') {
+          ctx.fillText('FRONT (Anterior)', W / 2, 16);
+          ctx.fillText('BACK (Posterior)', W / 2, H - 14);
+          ctx.fillText('LEFT', 34, H / 2);
+          ctx.fillText('RIGHT', W - 34, H / 2);
 
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(160, 57); ctx.lineTo(160, 273); ctx.stroke();
-          } else {
-            ctx.fillText('FRONT (Eyes)', 32, 72);
-            ctx.fillText('BACK', 248, 72);
-            ctx.fillText('TOP OF HEAD', 124, 38);
-
-            ctx.fillStyle = '#334155';
-            ctx.strokeStyle = '#64748b';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.ellipse(160, 155, 102, 82, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-          }
-
-          // Glowing Hotspots
-          task.clusters.forEach((c, idx) => {
-            if (suiteState.noiseFilterLevel === 3 && c.strength < 3) return;
-            const gx = suiteState.slicePlane === 'axial' ? c.axX : c.sagX;
-            const gy = suiteState.slicePlane === 'axial' ? c.axY : c.sagY;
-            const pulse = Math.sin(Date.now() * 0.006) * 2.5;
-            const rad = c.r + pulse;
-
-            const grad = ctx.createRadialGradient(gx, gy, 2, gx, gy, rad);
-            grad.addColorStop(0, '#ffffff');
-            grad.addColorStop(0.35, '#fef08a');
-            grad.addColorStop(0.7, '#f97316');
-            grad.addColorStop(1, 'rgba(220, 38, 38, 0)');
-
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(gx, gy, rad, 0, Math.PI * 2);
-            ctx.fill();
-
-            if (idx === suiteState.selectedClusterIdx) {
-              ctx.strokeStyle = '#38bdf8';
-              ctx.lineWidth = 2;
-              ctx.beginPath();
-              ctx.arc(gx, gy, rad + 3, 0, Math.PI * 2);
-              ctx.stroke();
-            }
-          });
-
-          if (suiteState.noiseFilterLevel === 1) {
-            for (let n = 0; n < 8; n++) {
-              const nx = 105 + ((n * 37) % 110);
-              const ny = 85 + ((n * 43) % 150);
-              ctx.fillStyle = 'rgba(239, 68, 68, 0.5)';
-              ctx.beginPath();
-              ctx.arc(nx, ny, 7, 0, Math.PI * 2);
-              ctx.fill();
-            }
-          }
-        }
-
-        else if (suiteState.activeModalMode === 'boldscope') {
-          drawBoldScopeOnCanvas(canvas);
-        }
-
-        else {
-          // Oxygen Wave (HRF) Curve View
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = 'bold 11px Inter, sans-serif';
-          ctx.fillText(`OXYGEN (BOLD) WAVE — ${task.name}`, 18, 28);
-
-          ctx.strokeStyle = '#1e293b';
-          for (let gy = 65; gy <= 265; gy += 50) {
-            ctx.beginPath(); ctx.moveTo(25, gy); ctx.lineTo(300, gy); ctx.stroke();
-          }
-
-          ctx.strokeStyle = '#64748b';
-          ctx.setLineDash([4, 4]);
-          ctx.beginPath(); ctx.moveTo(25, 225); ctx.lineTo(300, 225); ctx.stroke();
-          ctx.setLineDash([]);
-
-          ctx.strokeStyle = '#10b981';
-          ctx.lineWidth = 3.5;
+          ctx.fillStyle = '#f1f5f9';
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
-          for (let s = 0; s <= 20; s += 0.25) {
-            const hx = 28 + (s / 20) * 268;
-            const wave = Math.exp(-Math.pow(s - 6.5, 2) / 11);
-            const hy = 225 - wave * 125;
-            if (s === 0) ctx.moveTo(hx, hy);
-            else ctx.lineTo(hx, hy);
-          }
+          ctx.ellipse(W / 2, H / 2, 82, 104, 0, 0, Math.PI * 2);
+          ctx.fill();
           ctx.stroke();
 
-          ctx.fillStyle = '#fde047';
-          ctx.font = 'bold 10px Inter, sans-serif';
-          ctx.fillText(`▲ Peak Oxygen Rush (+${task.boldPct}% @ ~5-6 sec)`, 65, 82);
-          ctx.fillStyle = '#f8fafc';
-          ctx.fillText('1. Task Starts (0s)', 25, 255);
-          ctx.fillStyle = '#34d399';
-          ctx.fillText('3. Returns to Rest (15-20s)', 165, 255);
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(W / 2, H / 2 - 104); ctx.lineTo(W / 2, H / 2 + 104); ctx.stroke();
+
+          ctx.fillStyle = '#cbd5e1';
+          ctx.beginPath();
+          ctx.ellipse(W / 2 - 10, H / 2 - 6, 6, 20, -0.18, 0, Math.PI * 2);
+          ctx.ellipse(W / 2 + 10, H / 2 - 6, 6, 20, 0.18, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillText('FRONT', 45, 45);
+          ctx.fillText('BACK', W - 45, 45);
+          ctx.fillText('TOP (Superior)', W / 2, 18);
+
+          ctx.fillStyle = '#f1f5f9';
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(W / 2, 140, 96, 72, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#e2e8f0';
+          ctx.beginPath();
+          ctx.ellipse(215, 202, 32, 22, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillRect(158, 195, 22, 46);
         }
+        ctx.restore();
+
+        task.clusters.forEach((c, idx) => {
+          if (suiteState.noiseFilterLevel === 3 && c.strength < 3) return;
+          const gx = suiteState.slicePlane === 'axial' ? c.axX : c.sagX;
+          const gy = suiteState.slicePlane === 'axial' ? c.axY : c.sagY;
+          const pulse = Math.sin(Date.now() * 0.006) * 2.0;
+          const rad = c.r + pulse;
+
+          const grad = ctx.createRadialGradient(gx, gy, 2, gx, gy, rad);
+          grad.addColorStop(0, '#fef08a');
+          grad.addColorStop(0.45, '#f97316');
+          grad.addColorStop(0.8, '#dc2626');
+          grad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(gx, gy, rad, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (idx === suiteState.selectedClusterIdx) {
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 2]);
+            ctx.beginPath();
+            ctx.arc(gx, gy, rad + 3, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        });
+
+        if (suiteState.noiseFilterLevel === 1) {
+          for (let n = 0; n < 8; n++) {
+            const nx = 115 + ((n * 37) % 110);
+            const ny = 80 + ((n * 43) % 140);
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+            ctx.beginPath();
+            ctx.arc(nx, ny, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      } else {
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText(`HEMODYNAMIC RESPONSE (HRF) — ${task.name}`, W / 2, 22);
+
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        for (let gy = 65; gy <= 245; gy += 45) {
+          ctx.beginPath(); ctx.moveTo(28, gy); ctx.lineTo(W - 28, gy); ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#a4123f';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let s = 0; s <= 20; s += 0.25) {
+          const hx = 28 + (s / 20) * (W - 56);
+          const wave = Math.exp(-Math.pow(s - 6.5, 2) / 11);
+          const hy = 225 - wave * 125;
+          if (s === 0) ctx.moveTo(hx, hy);
+          else ctx.lineTo(hx, hy);
+        }
+        ctx.stroke();
+
+        ctx.fillStyle = '#a4123f';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.fillText(`Peak Oxygen Rush (+${task.boldPct}% at ~5-6 sec)`, W / 2, 75);
+        ctx.fillStyle = '#475569';
+        ctx.fillText('0s (Task Starts)                        20s (Returns to Rest)', W / 2, 255);
+        ctx.restore();
       }
-      requestAnimationFrame(animateOcularCanvas);
     }
 
     // ==================== WORKSHEET & LOGBOOK TABLES ====================
     function renderWorksheetTable() {
       const task = PARADIGMS[suiteState.paradigmKey];
-      const completed = suiteState.scanCompleted;
       const tbody = document.getElementById('fmri-worksheet-body');
 
       tbody.innerHTML = task.clusters.map((c, idx) => `
-        <tr onclick="suiteState.selectedClusterIdx=${idx}; openOcularModal('brainmap');" class="cursor-pointer hover:bg-rose-50/60 transition">
+        <tr onclick="suiteState.selectedClusterIdx=${idx}; setSlicePlane('axial'); updateModalDetails();" class="cursor-pointer hover:bg-slate-50 transition">
           <td class="p-2 font-bold text-slate-900">${c.roi}</td>
-          <td class="p-2 text-indigo-700 font-semibold">${c.location}</td>
-          <td class="p-2 mono font-bold ${completed ? 'text-emerald-700' : 'text-slate-400'}">${completed ? c.bold : 'Run Scan (Step 5)'}</td>
+          <td class="p-2 text-slate-700 font-semibold">${c.location}</td>
+          <td class="p-2 mono font-bold text-emerald-700">${c.bold}</td>
           <td class="p-2 text-slate-600">${c.role}</td>
         </tr>
       `).join('');
@@ -1839,28 +1781,26 @@
         name: task.name,
         area: task.mainArea,
         side: task.side,
-        bold: `+${task.boldPct}% Oxygen`,
+        bold: `+${task.boldPct}%`,
         takeaway: task.simpleTakeaway
       });
 
       const tbody = document.getElementById('logbook-tbody');
       tbody.innerHTML = suiteState.logbook.map((r, i) => `
-        <tr class="${i === 0 ? 'bg-rose-50 font-semibold' : ''}">
+        <tr class="${i === 0 ? 'bg-rose-50/50 font-semibold' : ''}">
           <td class="p-1.5 text-[#a4123f] font-bold">#${suiteState.logbook.length - i}</td>
           <td class="p-1.5">${r.name}</td>
-          <td class="p-1.5 text-indigo-800">${r.area}</td>
-          <td class="p-1.5">${r.side}</td>
+          <td class="p-1.5 text-slate-900">${r.area}</td>
           <td class="p-1.5 mono text-emerald-700 font-bold">${r.bold}</td>
         </tr>
       `).join('');
-      document.getElementById('log-counter').textContent = `${suiteState.logbook.length} Logged`;
     }
 
     function downloadCSV() {
-      if (suiteState.logbook.length === 0) {
+      if (suiteState.logbook.length === 0 && suiteState.taskSelected) {
         autoLogCompletedScan();
       }
-      const headers = ["Scan_No", "Time", "Activity_Performed", "Main_Active_Brain_Region", "Brain_Side", "Oxygen_Boost_BOLD", "Beginner_Interpretation"];
+      const headers = ["Scan_No", "Time", "Task", "Active_Brain_Region", "Hemisphere", "BOLD_Signal_Boost", "Interpretation"];
       const rows = suiteState.logbook.slice().reverse().map((r, i) => [
         i + 1, `"${r.time}"`, `"${r.name}"`, `"${r.area}"`, `"${r.side}"`, `"${r.bold}"`, `"${r.takeaway}"`
       ]);
@@ -1868,23 +1808,24 @@
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `fMRI_Brain_Mapping_Log_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `fMRI_Activation_Log_${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
     }
 
     function downloadReportTXT() {
+      if (!suiteState.taskSelected) return;
       const task = PARADIGMS[suiteState.paradigmKey];
       const txt = [
         "====================================================================",
-        "          fMRI BRAIN IMAGING & ACTIVATION MAPPING SUMMARY           ",
+        "          fMRI BRAIN IMAGING & ACTIVATION MAPPING REPORT            ",
         "====================================================================",
-        `Activity Performed  : ${task.name}`,
-        `What Volunteer Did  : ${task.stimulusType}`,
-        `Main Brain Region   : ${task.mainArea} (${task.side})`,
-        `Oxygen Boost (BOLD) : +${task.boldPct}%`,
-        `Key Takeaway        : ${task.simpleTakeaway}`,
+        `Brain Task          : ${task.name} (${task.code})`,
+        `Stimulus Protocol   : ${task.stimulusType}`,
+        `Primary Active Area : ${task.mainArea} (${task.side})`,
+        `Peak BOLD Change    : +${task.boldPct}%`,
+        `Interpretation      : ${task.simpleTakeaway}`,
         "--------------------------------------------------------------------",
-        "BRAIN AREA                             LOCATION                  ROLE",
+        "BRAIN REGION                           LOCATION                  FUNCTION",
         "--------------------------------------------------------------------",
         ...task.clusters.map(c => `${c.roi.padEnd(38)} ${c.location.padEnd(25)} ${c.role}`),
         "====================================================================",
@@ -1893,15 +1834,12 @@
       const blob = new Blob([txt], { type: "text/plain;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `fMRI_Summary_${task.code}.txt`;
+      a.download = `fMRI_Report_${task.code}.txt`;
       a.click();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      initCapillaryCells();
-      updateBannerUI();
       requestAnimationFrame(renderScannerSuite);
-      requestAnimationFrame(animateOcularCanvas);
     });
   </script>
 </body>
